@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Eye, EyeOff, Github } from "lucide-react"
+import { Eye, EyeOff, GitBranch } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { signIn } from "@/lib/auth/cognito"
@@ -121,7 +121,7 @@ export default function SignInPage() {
 
       <Button variant="outline" className="w-full gap-2" asChild>
         <a href={`https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID}&scope=repo`}>
-          <Github className="h-4 w-4" />
+          <GitBranch className="h-4 w-4" />
           Continue with GitHub
         </a>
       </Button>

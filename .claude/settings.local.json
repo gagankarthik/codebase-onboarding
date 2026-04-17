@@ -4,7 +4,8 @@
       "Bash(npm install *)",
       "Bash(npx shadcn@latest add button card badge input label textarea select dialog drawer sheet popover dropdown-menu toast toaster sonner avatar separator skeleton progress tabs accordion collapsible table command tooltip form alert alert-dialog)",
       "Bash(npx shadcn@latest add card badge input label textarea select)",
-      "Bash(npx shadcn@latest add dialog drawer sheet popover dropdown-menu sonner avatar separator skeleton progress tabs accordion collapsible table command tooltip form alert alert-dialog)"
+      "Bash(npx shadcn@latest add dialog drawer sheet popover dropdown-menu sonner avatar separator skeleton progress tabs accordion collapsible table command tooltip form alert alert-dialog)",
+      "Bash(npm run *)"
     ]
   }
 }

@@ -1,29 +1,30 @@
-// app/page.tsx
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   ArrowRight,
   CheckCircle2,
   ChevronRight,
   Code2,
+  GitBranch,
   Menu,
   MessageCircle,
   Rocket,
+  Sparkles,
   Users,
   X,
-  Zap
+  Zap,
+  Building2,
 } from 'lucide-react';
 import {
-  LineChart,
-  Line,
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Area,
-  AreaChart
 } from 'recharts';
 
 // --- Data ---
@@ -74,100 +75,64 @@ const MRR_DATA = [
 ];
 
 // --- UI Components ---
-const Badge = ({ children, variant = 'default', className = '' }: { children: React.ReactNode; variant?: 'default' | 'success' | 'warning' | 'info' | 'purple'; className?: string }) => {
-  const variants = {
-    default: 'bg-gray-100 text-gray-800',
-    success: 'bg-green-50 text-green-700',
-    warning: 'bg-amber-50 text-amber-700',
-    info: 'bg-blue-50 text-blue-700',
-    purple: 'bg-purple-50 text-purple-700',
-  };
-  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}>{children}</span>;
-};
-
-const Card = ({ children, className = '', highlighted = false }: { children: React.ReactNode; className?: string; highlighted?: boolean }) => (
-  <div
-    className={`bg-white rounded-2xl border ${
-      highlighted
-        ? 'border-green-500 shadow-xl shadow-green-50 ring-1 ring-green-500/20'
-        : 'border-gray-200 shadow-sm'
-    } ${className}`}
-  >
-    {children}
-  </div>
-);
-
 const SectionHeader = ({ label, title, description }: { label: string; title: string; description?: string }) => (
-  <div className="text-center max-w-2xl mx-auto mb-12">
-    <Badge variant="info" className="mb-4">
+  <div className="text-center max-w-2xl mx-auto mb-10">
+    <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary-subtle px-3 py-1 text-xs font-medium text-primary mb-4">
       {label}
-    </Badge>
-    <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-4">{title}</h2>
-    {description && <p className="text-lg text-gray-600">{description}</p>}
+    </div>
+    <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-3">{title}</h2>
+    {description && <p className="text-base text-foreground-muted leading-relaxed">{description}</p>}
   </div>
 );
 
 // --- Main Component ---
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [email, setEmail] = useState('');
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4 md:py-6">
+          <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-emerald-500 rounded-lg flex items-center justify-center">
-                <Code2 className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Code2 className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="font-bold text-xl text-gray-900">OnboardAI</span>
+              <span className="font-bold text-base text-foreground">Codebase Onboarding</span>
             </div>
-            <nav className="hidden md:flex items-center gap-8">
-              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Product
-              </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
-                How it works
-              </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Pricing
-              </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
-                FAQ
-              </a>
+            <nav className="hidden md:flex items-center gap-6">
+              {['How it works', 'Pricing', 'Customers'].map((item) => (
+                <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className="text-sm text-foreground-muted hover:text-foreground transition-colors">
+                  {item}
+                </a>
+              ))}
             </nav>
-            <div className="hidden md:flex items-center gap-4">
-              <button className="text-gray-700 hover:text-gray-900">Sign in</button>
-              <button className="bg-gray-900 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
-                Get started →
-              </button>
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/sign-in" className="text-sm text-foreground-muted hover:text-foreground transition-colors">
+                Sign in
+              </Link>
+              <Link href="/sign-up" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover transition-colors">
+                Get started <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2">
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-foreground-muted">
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
         {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-x-0 top-[65px] bg-white border-b border-gray-200 p-4 z-40">
-            <div className="flex flex-col gap-4">
-              <a href="#" className="text-gray-600 py-2">
-                Product
-              </a>
-              <a href="#" className="text-gray-600 py-2">
-                How it works
-              </a>
-              <a href="#" className="text-gray-600 py-2">
-                Pricing
-              </a>
-              <a href="#" className="text-gray-600 py-2">
-                FAQ
-              </a>
-              <hr className="my-2" />
-              <button className="text-gray-700 py-2">Sign in</button>
-              <button className="bg-gray-900 text-white py-2 rounded-full text-center">
-                Get started →
-              </button>
+          <div className="md:hidden bg-background border-b border-border p-4">
+            <div className="flex flex-col gap-3">
+              {['How it works', 'Pricing', 'Customers'].map((item) => (
+                <a key={item} href="#" className="text-sm text-foreground-muted py-1.5">{item}</a>
+              ))}
+              <hr className="border-border my-1" />
+              <Link href="/sign-in" className="text-sm text-foreground-muted py-1.5">Sign in</Link>
+              <Link href="/sign-up" className="bg-primary text-primary-foreground py-2 rounded-full text-sm text-center font-medium">
+                Get started
+              </Link>
             </div>
           </div>
         )}
@@ -175,125 +140,120 @@ export default function LandingPage() {
 
       <main className="overflow-hidden">
         {/* Hero Section */}
-        <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-green-50/40 via-white to-emerald-50/20" />
+        <section className="relative pt-16 pb-24 overflow-hidden">
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary-subtle via-background to-background" />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="flex justify-center gap-2 mb-6 flex-wrap">
-              <Badge variant="info">Level 2 Deep Dive</Badge>
-              <Badge variant="success">Validated market</Badge>
-              <Badge variant="warning">$20–70K MRR potential</Badge>
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-subtle px-4 py-1.5 text-sm text-primary mb-8">
+              <Sparkles className="h-3.5 w-3.5" />
+              Powered by GPT-4o mini · Reads your actual codebase
             </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 max-w-5xl mx-auto mb-6">
-              Codebase Onboarding{' '}
-              <span className="bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
-                Accelerator
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground max-w-4xl mx-auto mb-6 leading-[1.1]">
+              New hires ship their{' '}
+              <span className="bg-gradient-to-r from-primary to-[oklch(0.59_0.243_290)] bg-clip-text text-transparent">
+                first PR in days
               </span>
+              {' '}not months
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10">
-              AI that reads your GitHub repo and generates a living, interactive guide so new hires
-              ship in days — not months.
+            <p className="text-lg md:text-xl text-foreground-muted max-w-2xl mx-auto mb-10 leading-relaxed">
+              Connect your GitHub repo. AI reads the codebase and generates a personalised, interactive
+              onboarding guide for every new engineer — role-specific, always up to date.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gray-900 text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-800 transition-all inline-flex items-center gap-2">
-                Get started <ArrowRight className="w-5 h-5" />
-              </button>
-              <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-50 transition-all">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/sign-up" className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary-hover transition-colors">
+                Start for free <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a href="#how-it-works" className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-6 py-3 text-base font-medium text-foreground hover:bg-background-muted transition-colors">
                 See how it works
-              </button>
+              </a>
             </div>
-            <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-               
-                Connect GitHub repo
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5" />
-                AI scans & generates
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Personalised for each role
-              </div>
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" />
-                Chat with your codebase
-              </div>
+            <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-foreground-muted">
+              {[
+                { icon: GitBranch, label: 'Connect GitHub repo' },
+                { icon: Zap, label: 'AI scans & generates' },
+                { icon: Users, label: 'Personalised by role' },
+                { icon: MessageCircle, label: 'Chat with codebase' },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-2">
+                  <Icon className="w-4 h-4 text-primary" />
+                  {label}
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Stats Grid */}
-        <section className="py-16 bg-gray-50/50 border-y border-gray-100">
+        <section className="py-16 bg-background-subtle border-y border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {STATS.map((stat, idx) => (
-                <Card key={idx} className="p-6 text-center">
-                  <div className="text-sm font-medium text-gray-500 mb-2">{stat.label}</div>
-                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-gray-400">{stat.note}</div>
-                </Card>
+                <div key={idx} className="rounded-xl border border-border bg-card p-6 text-center">
+                  <div className="text-xs font-medium text-foreground-muted mb-2">{stat.label}</div>
+                  <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
+                  <div className="text-xs text-foreground-subtle">{stat.note}</div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* Insight Box */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-green-50 border-l-4 border-green-500 rounded-r-2xl p-6 md:p-8">
-              <p className="text-green-800 text-lg leading-relaxed">
-                The gap you're filling:{' '}
-                <strong>
+        <section className="py-16" id="how-it-works">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="rounded-2xl border border-primary/20 bg-primary-subtle p-6 md:p-8">
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary">
+                  <Building2 className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <p className="text-base text-foreground leading-relaxed">
+                  <strong>The gap nobody has filled:</strong>{' '}
                   Mintlify and Swimm solve public-facing docs and inline code comments.
-                </strong>{' '}
-                Nobody has built a tool that auto-generates a new hire's first-week experience — an
-                interactive, personalised walkthrough of the actual codebase they're joining.
-                That's a completely different problem, and a completely different buyer
-                (engineering manager, not the developer).
-              </p>
+                  Nobody has built a tool that auto-generates a new hire&apos;s first-week experience — an
+                  interactive, personalised walkthrough of the actual codebase they&apos;re joining.
+                  That&apos;s a completely different problem, and a completely different buyer.
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Pain Timeline */}
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-background">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeader
               label="The Problem"
               title="What actually happens during a developer's first 8 weeks"
-              description="Without your tool, onboarding is slow, painful, and expensive."
+              description="Without the right tools, onboarding is slow, painful, and expensive."
             />
-            <div className="space-y-0 border border-gray-200 rounded-2xl overflow-hidden">
+            <div className="rounded-2xl border border-border overflow-hidden">
               {TIMELINE_STAGES.map((stage, idx) => (
                 <div
                   key={idx}
-                  className={`flex flex-col sm:flex-row border-b last:border-b-0 ${
+                  className={`flex flex-col sm:flex-row border-b border-border last:border-b-0 ${
                     stage.color === 'error'
-                      ? 'bg-red-50/30'
+                      ? 'bg-destructive-subtle/40'
                       : stage.color === 'warning'
-                      ? 'bg-amber-50/30'
-                      : 'bg-green-50/30'
+                      ? 'bg-warning-subtle/40'
+                      : 'bg-success-subtle/40'
                   }`}
                 >
-                  <div className="sm:w-32 p-4 border-r border-gray-200 flex flex-col items-center justify-center">
-                    <span className="text-xs font-medium text-gray-500">Week</span>
+                  <div className="sm:w-32 p-4 border-b sm:border-b-0 sm:border-r border-border flex sm:flex-col items-center justify-center gap-2 sm:gap-0">
+                    <span className="text-xs font-medium text-foreground-muted">Period</span>
                     <span
-                      className={`text-xl font-bold ${
+                      className={`text-sm font-bold ${
                         stage.color === 'error'
-                          ? 'text-red-600'
+                          ? 'text-destructive'
                           : stage.color === 'warning'
-                          ? 'text-amber-600'
-                          : 'text-green-600'
+                          ? 'text-warning-foreground'
+                          : 'text-success'
                       }`}
                     >
                       {stage.week}
                     </span>
                   </div>
                   <div className="flex-1 p-4">
-                    <h3 className="font-semibold text-gray-900 mb-1">{stage.title}</h3>
-                    <p className="text-gray-600 text-sm">{stage.description}</p>
+                    <h3 className="font-semibold text-foreground mb-1">{stage.title}</h3>
+                    <p className="text-foreground-muted text-sm">{stage.description}</p>
                   </div>
                 </div>
               ))}
@@ -302,158 +262,117 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Flow */}
-        <section className="py-16 bg-gray-50/50">
+        <section className="py-16 bg-background-subtle" id="how-it-works">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeader
               label="The Solution"
-              title="How your tool compresses this to 3–5 days"
-              description="From GitHub connection to first PR in under a week."
+              title="From repo connect to first PR in under a week"
+              description="Five steps. Zero writing. Completely automated."
             />
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
               {[
-                'Connect GitHub',
-                'AI scans repo',
-                'Generate tour',
-                'Chat & learn',
-                'Ship first PR',
-              ].map((step, idx) => (
-                <div
-                  key={idx}
-                  className="relative bg-white rounded-xl p-4 text-center border border-gray-200 shadow-sm"
-                >
-                  <div className="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center mx-auto mb-3 font-semibold">
-                    {idx + 1}
+                { step: 'Connect GitHub', icon: GitBranch },
+                { step: 'AI scans repo', icon: Zap },
+                { step: 'Generate guide', icon: Sparkles },
+                { step: 'Chat & learn', icon: MessageCircle },
+                { step: 'Ship first PR', icon: Rocket },
+              ].map(({ step, icon: Icon }, idx) => (
+                <div key={idx} className="relative rounded-xl border border-border bg-card p-4 text-center">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-subtle text-primary mx-auto mb-3">
+                    <Icon className="h-4 w-4" />
                   </div>
-                  <div className="font-medium text-gray-900 text-sm">{step}</div>
+                  <div className="text-xs font-medium text-foreground-muted mb-1">Step {idx + 1}</div>
+                  <div className="font-semibold text-foreground text-sm">{step}</div>
                   {idx < 4 && (
-                    <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 text-gray-300">
-                      <ChevronRight className="w-5 h-5" />
+                    <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 text-foreground-subtle z-10">
+                      <ChevronRight className="w-4 h-4" />
                     </div>
                   )}
                 </div>
               ))}
             </div>
-            <div className="mt-8 bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <p className="text-gray-600 text-center">
-                The output isn't just docs. It's a{' '}
-                <strong className="text-gray-900">personalised Day 1 experience</strong>:
-                "Here are the 5 modules you'll touch most. Here's who wrote them and why. Here's
-                the team's coding convention. Here are 3 starter tasks ranked by difficulty."
+            <div className="mt-6 rounded-xl border border-border bg-card p-6">
+              <p className="text-foreground-muted text-center text-sm leading-relaxed">
+                The output isn&apos;t just docs. It&apos;s a{' '}
+                <strong className="text-foreground">personalised Day 1 experience</strong>:{' '}
+                &ldquo;Here are the 5 modules you&apos;ll touch most. Here&apos;s the team&apos;s coding convention.
+                Here are 3 starter tasks ranked by difficulty.&rdquo;
               </p>
             </div>
           </div>
         </section>
 
         {/* Competitive Landscape */}
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeader
               label="Market Landscape"
               title="Why the gap exists"
-              description="Existing tools solve different problems. You're building something new."
+              description="Existing tools solve different problems. We're building something new."
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="p-6">
-                <h3 className="font-semibold text-gray-900">Mintlify</h3>
-                <div className="text-sm text-gray-500 mt-1">$300/mo — public-facing API docs</div>
-                <div className="mt-4 text-xs font-medium text-amber-700">Gap for you:</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  Builds beautiful external docs but requires manual MDX. Not for onboarding. Buyer
-                  is DevRel, not EM.
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { name: 'Mintlify', pricing: '$300/mo · API docs', gap: 'Requires manual MDX writing. Buyer is DevRel, not the engineering manager. Not for onboarding.' },
+                { name: 'Swimm', pricing: 'Free + paid · Code-linked docs', gap: "Devs must write the docs first. Keeps them synced, but won't generate them for you." },
+                { name: 'Confluence / Notion', pricing: '$5–15/user · Generic wikis', gap: 'Always out of date. No live code connection. The engineering graveyard.' },
+              ].map((comp) => (
+                <div key={comp.name} className="rounded-xl border border-border bg-card p-5">
+                  <h3 className="font-semibold text-foreground">{comp.name}</h3>
+                  <p className="text-xs text-foreground-muted mt-1">{comp.pricing}</p>
+                  <div className="mt-4 text-xs font-medium text-warning-foreground">The gap:</div>
+                  <p className="mt-1 text-sm text-foreground-muted">{comp.gap}</p>
                 </div>
-              </Card>
-              <Card className="p-6">
-                <h3 className="font-semibold text-gray-900">Swimm</h3>
-                <div className="text-sm text-gray-500 mt-1">Free + paid — code-linked docs</div>
-                <div className="mt-4 text-xs font-medium text-amber-700">Gap for you:</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  Keeps internal docs synced, but devs must write them first. Not an onboarding
-                  accelerator.
-                </div>
-              </Card>
-              <Card className="p-6">
-                <h3 className="font-semibold text-gray-900">Confluence / Notion</h3>
-                <div className="text-sm text-gray-500 mt-1">$5–15/user — generic wikis</div>
-                <div className="mt-4 text-xs font-medium text-amber-700">Gap for you:</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  Always out of date. No code connection. Engineering graveyard.
-                </div>
-              </Card>
-              <Card highlighted className="p-6 border-green-500">
-                <h3 className="font-semibold text-gray-900">Your Tool</h3>
-                <div className="text-sm text-green-600 font-medium mt-1">
-                  $49–99/seat — onboarding-first
-                </div>
-                <div className="mt-4 text-xs font-medium text-green-700">Your differentiation:</div>
-                <div className="text-sm text-gray-600 mt-1">
-                  Zero writing. Connects to GitHub. Generates entire onboarding. Personalised per
-                  role. For the EM.
-                </div>
-              </Card>
+              ))}
+              <div className="rounded-xl border border-primary bg-primary-subtle p-5">
+                <h3 className="font-semibold text-foreground">Codebase Onboarding</h3>
+                <p className="text-xs text-primary font-medium mt-1">$49–99/mo · Onboarding-first</p>
+                <div className="mt-4 text-xs font-medium text-primary">Our advantage:</div>
+                <p className="mt-1 text-sm text-foreground-muted">
+                  Zero writing required. Reads your GitHub repo. Generates personalised guides per role. Built for the engineering manager.
+                </p>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Feature Comparison Table */}
-        <section className="py-16 bg-gray-50/50">
+        <section className="py-16 bg-background-subtle" id="pricing">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeader
-              label="Feature Deep Dive"
-              title="Where you win"
-              description="A clear, undeniable advantage across every dimension that matters for engineering onboarding."
+              label="Feature Comparison"
+              title="Where we win"
+              description="The complete advantage across every dimension that matters for engineering onboarding."
             />
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-border bg-card">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-medium text-gray-500">Feature</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500">Mintlify</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500">Swimm</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500">Confluence</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900 bg-green-50 rounded-t-lg">
-                      Your Tool
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Feature</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Mintlify</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Swimm</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Confluence</th>
+                    <th className="py-3 px-4 font-semibold text-primary text-left bg-primary-subtle/50">
+                      Our Tool
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {FEATURE_COMPARISON.map((item, idx) => (
-                    <tr key={idx} className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-gray-900">{item.feature}</td>
-                      <td className="py-3 px-4">
-                        {typeof item.mintlify === 'boolean' ? (
-                          item.mintlify ? (
-                            <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    <tr key={idx} className="border-b border-border last:border-0">
+                      <td className="py-3 px-4 font-medium text-foreground">{item.feature}</td>
+                      {(['mintlify', 'swimm', 'confluence'] as const).map((key) => (
+                        <td key={key} className="py-3 px-4">
+                          {item[key] === true ? (
+                            <CheckCircle2 className="w-4 h-4 text-success" />
+                          ) : item[key] === false ? (
+                            <div className="w-4 h-4 rounded-full border border-border-strong" />
                           ) : (
-                            <div className="w-4 h-4 rounded-full border border-gray-300" />
-                          )
-                        ) : (
-                          <span className="text-amber-600 text-xs">Partial</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        {typeof item.swimm === 'boolean' ? (
-                          item.swimm ? (
-                            <CheckCircle2 className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <div className="w-4 h-4 rounded-full border border-gray-300" />
-                          )
-                        ) : (
-                          <span className="text-amber-600 text-xs">Partial</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        {typeof item.confluence === 'boolean' ? (
-                          item.confluence ? (
-                            <CheckCircle2 className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <div className="w-4 h-4 rounded-full border border-gray-300" />
-                          )
-                        ) : (
-                          <span className="text-amber-600 text-xs">Partial</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 bg-green-50/30">
-                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            <span className="text-xs text-warning-foreground font-medium">Partial</span>
+                          )}
+                        </td>
+                      ))}
+                      <td className="py-3 px-4 bg-primary-subtle/30">
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
                       </td>
                     </tr>
                   ))}
@@ -463,237 +382,182 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* MVP Build Plan */}
-        <section className="py-16 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="The Roadmap"
-              title="MVP build plan — 6–8 weeks to launch"
-              description="A focused, lean approach to get your first paying customers fast."
-            />
-            <div className="space-y-4">
-              {[
-                'Week 1–2: GitHub OAuth + repo ingestion — build the data pipeline.',
-                'Week 3–4: AI codebase summary generation — module explanations, architecture overview.',
-                'Week 5: Role intake form + personalisation — customise for each new hire.',
-                'Week 6: Chat interface — RAG-based Q&A with the codebase.',
-                'Week 7–8: Stripe, polish, and first 10 paying customers.',
-              ].map((item, idx) => (
-                <div key={idx} className="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
-                  <div className="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-semibold text-sm">
-                    {idx + 1}
-                  </div>
-                  <p className="text-gray-700">{item}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* MVP Build Plan — skip this section on landing, replaced by Pricing */}
 
         {/* Pricing Section */}
-        <section className="py-16 bg-gray-50/50">
+        <section className="py-16 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeader
               label="Simple, Transparent Pricing"
               title="Choose the plan that fits your team"
-              description="Scales with you from startups to enterprises."
+              description="No per-seat surprises. Flat monthly pricing that scales with your team."
             />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {PRICING_TIERS.map((tier) => (
-                <Card
+                <div
                   key={tier.name}
-                  highlighted={tier.highlighted}
-                  className={`p-6 relative ${tier.highlighted ? 'border-green-500 shadow-xl' : ''}`}
+                  className={`relative rounded-2xl border p-6 ${
+                    tier.highlighted
+                      ? 'border-primary bg-primary-subtle'
+                      : 'border-border bg-card'
+                  }`}
                 >
                   {tier.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-xs font-medium px-3 py-1 rounded-full">
-                      Most Popular
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+                      Most popular
                     </div>
                   )}
-                  <div className="text-sm font-medium text-gray-500 mb-2">{tier.name}</div>
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-sm font-semibold text-foreground-muted mb-1">{tier.name}</div>
+                  <div className="text-4xl font-bold text-foreground">
                     ${tier.price}
-                    <span className="text-base font-normal text-gray-500">/mo</span>
+                    <span className="text-base font-normal text-foreground-muted">/mo</span>
                   </div>
-                  <div className="text-sm text-gray-500 mt-1 mb-6">{tier.description}</div>
-                  <ul className="space-y-3 mb-8">
+                  <div className="text-sm text-foreground-muted mt-1 mb-5">{tier.description}</div>
+                  <ul className="space-y-2.5 mb-6">
                     {tier.features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2 text-sm text-gray-600">
-                        <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <li key={feat} className="flex items-start gap-2 text-sm text-foreground-muted">
+                        <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${tier.highlighted ? 'text-primary' : 'text-success'}`} />
                         {feat}
                       </li>
                     ))}
                   </ul>
-                  <button
-                    className={`w-full py-2.5 rounded-full text-center font-medium transition-all ${
+                  <Link
+                    href="/sign-up"
+                    className={`block w-full py-2.5 rounded-full text-center text-sm font-medium transition-colors ${
                       tier.highlighted
-                        ? 'bg-gray-900 text-white hover:bg-gray-800'
-                        : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                        ? 'bg-primary text-primary-foreground hover:bg-primary-hover'
+                        : 'border border-border text-foreground hover:bg-background-muted'
                     }`}
                   >
                     {tier.cta}
-                  </button>
-                </Card>
+                  </Link>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
         {/* MRR Growth Chart */}
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-background-subtle">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeader
               label="Financial Projection"
               title="Realistic MRR growth path"
-              description="Based on lean customer acquisition and proven demand."
+              description="Based on lean customer acquisition and validated demand signals."
             />
-            <div className="bg-white p-4 rounded-xl border border-gray-200">
-              <div className="h-80">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={MRR_DATA}>
                     <defs>
                       <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        <stop offset="5%" stopColor="oklch(0.546 0.243 264.4)" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="oklch(0.546 0.243 264.4)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#6b7280' }} />
-                    <YAxis
-                      tick={{ fontSize: 12, fill: '#6b7280' }}
-                      tickFormatter={(value) => `$${value.toLocaleString()}`}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.914 0.005 264.5)" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'oklch(0.52 0.025 231)' }} />
+                    <YAxis tick={{ fontSize: 11, fill: 'oklch(0.52 0.025 231)' }} tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} />
                     <Tooltip
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'MRR']}
-                      contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                      formatter={(value) => [`$${Number(value).toLocaleString()}`, 'MRR']}
+                      contentStyle={{ borderRadius: '8px', border: '1px solid oklch(0.914 0.005 264.5)', background: 'oklch(1 0 0)' }}
                     />
-                    <Area
-                      type="monotone"
-                      dataKey="mrr"
-                      stroke="#10b981"
-                      strokeWidth={2}
-                      fill="url(#mrrGradient)"
-                    />
-                    <Line type="monotone" dataKey="mrr" stroke="#10b981" strokeWidth={2} dot={{ r: 4, fill: '#10b981' }} />
+                    <Area type="monotone" dataKey="mrr" stroke="oklch(0.546 0.243 264.4)" strokeWidth={2} fill="url(#mrrGradient)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 text-center text-sm text-gray-500">
-                Projected MRR from $490 to $68,000 in 12 months
-              </div>
+              <p className="mt-4 text-center text-xs text-foreground-muted">
+                Projected MRR growth from $490 to $68,000 over 12 months
+              </p>
             </div>
           </div>
         </section>
 
         {/* GTM Strategy */}
-        <section className="py-16 bg-gray-50/50">
+        <section className="py-16 bg-background" id="customers">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <SectionHeader
               label="Go-to-Market"
-              title="How you get the first 50 customers"
-              description="Targeted channels where engineering managers are already looking for solutions."
+              title="How we reach the first 50 customers"
+              description="Targeted channels where engineering managers are already feeling this pain."
             />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="p-6">
-                <div className="w-12 h-12 bg-blue-50 text-blue-700 rounded-xl flex items-center justify-center mb-4">
-                  <Users className="w-6 h-6" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { icon: Users, title: 'YC Slack & Hacker News', body: 'YC companies are always hiring. A Show HN post reaches hundreds of engineering managers who live this problem daily.' },
+                { icon: Building2, title: 'LinkedIn Cold Outreach', body: 'Target CTOs at 10–100 person companies that posted engineering jobs in the last 30 days. The pain is live and acute.' },
+                { icon: Rocket, title: 'Build in Public', body: 'Post on Dev Twitter. "Day 14: generated a 30-page onboarding guide for a 50-file codebase in 4 minutes."' },
+              ].map(({ icon: Icon, title, body }) => (
+                <div key={title} className="rounded-xl border border-border bg-card p-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-subtle mb-4">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{title}</h3>
+                  <p className="text-foreground-muted text-sm leading-relaxed">{body}</p>
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">YC Slack & Hacker News</h3>
-                <p className="text-gray-600 text-sm">
-                  YC companies are always hiring and onboarding. Post "Show HN" to reach
-                  engineering managers directly.
-                </p>
-              </Card>
-              <Card className="p-6">
-                <div className="w-12 h-12 bg-blue-50 text-blue-700 rounded-xl flex items-center justify-center mb-4">
-                <p>LinkedIn</p>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">LinkedIn Cold Outreach</h3>
-                <p className="text-gray-600 text-sm">
-                  Target CTOs at 10–100 person companies that posted engineering jobs in the last
-                  30 days. Pain is live.
-                </p>
-              </Card>
-              <Card className="p-6">
-                <div className="w-12 h-12 bg-blue-50 text-blue-700 rounded-xl flex items-center justify-center mb-4">
-                  <Rocket className="w-6 h-6" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Build in Public</h3>
-                <p className="text-gray-600 text-sm">
-                  Post your journey on Dev Twitter. "Day 14: generated a 30-page codebase guide in
-                  4 minutes."
-                </p>
-              </Card>
+              ))}
             </div>
           </div>
         </section>
 
         {/* CTA Banner */}
-        <section className="py-20 bg-gray-900">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <section className="py-20 bg-gradient-to-br from-[oklch(0.3_0.243_264.4)] to-[oklch(0.165_0.2_264.4)]">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
               Ready to fix engineering onboarding?
             </h2>
-            <p className="text-gray-300 text-lg mb-8">
-              Join the waitlist and be among the first to transform how your team ramps up new
-              developers.
+            <p className="text-white/70 text-lg mb-10 leading-relaxed">
+              Join teams already onboarding engineers 80% faster. Get your first guide generated in minutes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your work email"
-                className="px-6 py-3 rounded-full bg-white/10 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 sm:w-80"
+                className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 sm:w-72 text-sm"
               />
-              <button className="bg-green-500 text-white px-8 py-3 rounded-full font-medium hover:bg-green-600 transition-colors">
-                Request early access →
-              </button>
+              <Link href="/sign-up" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[oklch(0.3_0.243_264.4)] hover:bg-white/90 transition-colors">
+                Get started free <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
-            <p className="text-gray-500 text-sm mt-6">No spam. Unsubscribe anytime.</p>
+            <p className="text-white/40 text-xs mt-5">No credit card required · Cancel anytime</p>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-gray-200 py-12 bg-white">
+        <footer className="border-t border-border py-12 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Code2 className="w-6 h-6 text-green-600" />
-                  <span className="font-bold text-gray-900">OnboardAI</span>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+              <div className="col-span-2 md:col-span-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
+                    <Code2 className="h-3.5 w-3.5 text-primary-foreground" />
+                  </div>
+                  <span className="font-bold text-sm text-foreground">Codebase Onboarding</span>
                 </div>
-                <p className="text-sm text-gray-500">
-                  AI-powered codebase onboarding for modern engineering teams.
+                <p className="text-xs text-foreground-muted leading-relaxed">
+                  AI-powered engineering onboarding for modern teams.
                 </p>
               </div>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-4">Product</h4>
-                <ul className="space-y-2 text-sm text-gray-500">
-                  <li>Features</li>
-                  <li>Pricing</li>
-                  <li>Demo</li>
-                  <li>Changelog</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-4">Company</h4>
-                <ul className="space-y-2 text-sm text-gray-500">
-                  <li>About</li>
-                  <li>Blog</li>
-                  <li>Careers</li>
-                  <li>Contact</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-4">Legal</h4>
-                <ul className="space-y-2 text-sm text-gray-500">
-                  <li>Privacy</li>
-                  <li>Terms</li>
-                  <li>Security</li>
-                </ul>
-              </div>
+              {[
+                { heading: 'Product', links: ['Features', 'Pricing', 'Changelog', 'Roadmap'] },
+                { heading: 'Company', links: ['About', 'Blog', 'Careers', 'Contact'] },
+                { heading: 'Legal', links: ['Privacy', 'Terms', 'Security', 'DPA'] },
+              ].map(({ heading, links }) => (
+                <div key={heading}>
+                  <h4 className="font-semibold text-xs text-foreground mb-3">{heading}</h4>
+                  <ul className="space-y-2">
+                    {links.map((l) => (
+                      <li key={l}>
+                        <a href="#" className="text-xs text-foreground-muted hover:text-foreground transition-colors">{l}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
-            <div className="pt-8 border-t border-gray-100 text-center text-sm text-gray-400">
-              © 2025 OnboardAI. All rights reserved.
+            <div className="pt-6 border-t border-border text-center text-xs text-foreground-subtle">
+              © 2026 Codebase Onboarding. All rights reserved.
             </div>
           </div>
         </footer>
