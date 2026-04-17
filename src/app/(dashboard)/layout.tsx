@@ -18,10 +18,9 @@ import {
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
+import { cn, getInitials } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { signOut, getCurrentUser } from "@/lib/auth/cognito"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useEffect } from "react"
 
 const NAV_ITEMS = [
@@ -63,26 +62,27 @@ function NavItem({
 function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [user, setUser] = useState<{ name: string; email: string; avatar?: string } | null>(null)
 
   useEffect(() => {
-    getCurrentUser().then((u) => {
-      if (u) setUser({ name: u.name, email: u.email })
-    })
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d: { user?: { name: string; email: string; avatar: string } | null }) => {
+        if (d.user) setUser(d.user)
+      })
+      .catch(() => {})
   }, [])
 
   async function handleSignOut() {
     try {
-      await signOut()
+      await fetch("/api/auth/signout", { method: "POST" })
       router.push("/sign-in")
     } catch {
       toast.error("Sign-out failed — please try again.")
     }
   }
 
-  const initials = user?.name
-    ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
-    : "?"
+  const initials = user?.name ? getInitials(user.name) : "?"
 
   return (
     <div
