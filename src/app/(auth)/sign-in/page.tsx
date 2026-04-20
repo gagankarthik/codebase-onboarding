@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 import { GitBranch } from "lucide-react"
+import Image from "next/image"
 
 export const metadata: Metadata = { title: "Sign in" }
 
@@ -20,28 +20,9 @@ export default function SignInPage() {
         href={authUrl}
         className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-background-muted"
       >
-        <GitBranch className="h-4 w-4" />
-        Continue with GitHub
+        <Image src="/GitHub.svg" alt="GitHub logo" className="h-5 w-5"  width={125} height={125}/>
       </a>
 
-      <p className="text-center text-xs text-foreground-muted">
-        By continuing you agree to our{" "}
-        <Link href="/terms" className="underline underline-offset-2 hover:text-foreground">
-          Terms
-        </Link>{" "}
-        and{" "}
-        <Link href="/privacy" className="underline underline-offset-2 hover:text-foreground">
-          Privacy Policy
-        </Link>
-        .
-      </p>
-
-      <p className="text-center text-sm text-foreground-muted">
-        New here?{" "}
-        <Link href="/sign-up" className="font-medium text-primary hover:underline">
-          Create an account
-        </Link>
-      </p>
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createSession, SESSION_COOKIE, COOKIE_OPTIONS } from "@/lib/auth/session"
 import { createUser, getUserById } from "@/lib/db/users"
-import { generateId } from "@/lib/utils"
 
 async function exchangeCodeForToken(code: string): Promise<string> {
   const res = await fetch("https://github.com/login/oauth/access_token", {
@@ -46,8 +45,7 @@ async function fetchGitHubEmail(token: string): Promise<string> {
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
-  const state = searchParams.get("state")
-  const redirectTo = state ? decodeURIComponent(state) : "/dashboard"
+  const state = searchParams.get("state") ?? "/dashboard"
 
   if (!code) {
     return NextResponse.redirect(new URL("/sign-in?error=missing_code", request.url))
@@ -79,10 +77,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       githubToken: accessToken,
     })
 
+    // If the OAuth flow was initiated for repo connection, go to repo picker
+    const redirectTo = state === "repo_connect" ? "/repos/select" : state
+
     const response = NextResponse.redirect(new URL(redirectTo, request.url))
     response.cookies.set(SESSION_COOKIE, sessionToken, COOKIE_OPTIONS)
     return response
-  } catch {
+  } catch (err) {
+    console.error("[auth/callback] error:", err)
     return NextResponse.redirect(new URL("/sign-in?error=auth_failed", request.url))
   }
 }

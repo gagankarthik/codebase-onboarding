@@ -17,7 +17,6 @@ Built with **Next.js · AWS Cognito · DynamoDB · GPT-4o mini · AWS Amplify**
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [AWS Setup](#aws-setup)
-  - [Cognito](#cognito)
   - [DynamoDB](#dynamodb)
   - [Amplify Deployment](#amplify-deployment)
 - [GitHub Integration](#github-integration)

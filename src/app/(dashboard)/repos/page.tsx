@@ -25,7 +25,9 @@ export default function ReposPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const githubOAuthUrl = `https://github.com/login/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID}&scope=repo,admin:repo_hook`
+  function handleConnect() {
+    router.push("/repos/select")
+  }
 
   return (
     <div className="space-y-8">
@@ -33,11 +35,9 @@ export default function ReposPage() {
         title="Your Repositories"
         subtitle="Connect GitHub repos to generate onboarding guides"
         actions={
-          <Button asChild>
-            <a href={githubOAuthUrl}>
-              <Plus className="mr-1.5 h-3.5 w-3.5" />
-              Connect repo
-            </a>
+          <Button onClick={handleConnect}>
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
+            Connect repo
           </Button>
         }
       />
@@ -53,7 +53,7 @@ export default function ReposPage() {
           icon={GitBranch}
           heading="No repos connected yet"
           description="Connect your first GitHub repo and have a personalised onboarding guide ready in minutes."
-          action={{ label: "Connect repo", onClick: () => (window.location.href = githubOAuthUrl) }}
+          action={{ label: "Connect repo", onClick: handleConnect }}
         />
       ) : (
         <motion.div

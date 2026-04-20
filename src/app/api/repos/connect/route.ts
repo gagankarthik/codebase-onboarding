@@ -1,55 +1,60 @@
 import { NextRequest, NextResponse } from "next/server"
-import { exchangeCodeForToken, getGitHubClient } from "@/lib/github/client"
+import { getGitHubClient } from "@/lib/github/client"
 import { createRepo, getReposByUserId } from "@/lib/db/repos"
 import { generateId } from "@/lib/utils"
 import { ingestRepo } from "@/lib/github/ingest"
 import { updateRepo } from "@/lib/db/repos"
+import { verifySession, SESSION_COOKIE } from "@/lib/auth/session"
+import { z } from "zod"
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const userId = request.headers.get("x-user-id")
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+const ConnectSchema = z.object({
+  fullName: z.string().min(1),
+})
 
-  const { searchParams } = new URL(request.url)
-  const code = searchParams.get("code")
-  if (!code) return NextResponse.json({ error: "Missing code parameter" }, { status: 400 })
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const sessionToken = request.cookies.get(SESSION_COOKIE)?.value
+  if (!sessionToken) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const accessToken = await exchangeCodeForToken(code)
-  const octokit = getGitHubClient(accessToken)
-  const { data: ghUser } = await octokit.users.getAuthenticated()
+  const session = await verifySession(sessionToken)
+  if (!session?.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: ghRepos } = await octokit.repos.listForAuthenticatedUser({
-    sort: "updated",
-    per_page: 1,
-  })
+  const body = await request.json() as unknown
+  const parsed = ConnectSchema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 })
 
-  const ghRepo = ghRepos[0]
-  if (!ghRepo) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
-  }
+  const { fullName } = parsed.data
+  const accessToken = session.githubToken
 
-  const existing = await getReposByUserId(userId)
-  const alreadyConnected = existing.find((r) => r.githubRepoId === ghRepo.id)
+  try {
+    const octokit = getGitHubClient(accessToken)
+    const { data: ghRepo } = await octokit.repos.get({
+      owner: fullName.split("/")[0],
+      repo: fullName.split("/")[1],
+    })
 
-  let repoId: string
-  if (alreadyConnected) {
-    repoId = alreadyConnected.repoId
-  } else {
+    const existing = await getReposByUserId(session.userId)
+    const alreadyConnected = existing.find((r) => r.githubRepoId === ghRepo.id)
+
+    if (alreadyConnected) {
+      return NextResponse.json({ repo: alreadyConnected })
+    }
+
     const repo = await createRepo({
       repoId: generateId(),
-      userId,
+      userId: session.userId,
       githubRepoId: ghRepo.id,
       fullName: ghRepo.full_name,
       description: ghRepo.description ?? undefined,
       language: ghRepo.language ?? undefined,
       stars: ghRepo.stargazers_count,
     })
-    repoId = repo.repoId
 
     ingestRepo(accessToken, ghRepo.full_name)
-      .then(() => updateRepo(repoId, { lastIngestedAt: new Date().toISOString() }))
+      .then(() => updateRepo(repo.repoId, { lastIngestedAt: new Date().toISOString() }))
       .catch(() => {})
-  }
 
-  void ghUser
-  return NextResponse.redirect(new URL("/dashboard", request.url))
+    return NextResponse.json({ repo })
+  } catch {
+    return NextResponse.json({ error: "Failed to connect repository" }, { status: 500 })
+  }
 }

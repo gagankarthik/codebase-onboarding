@@ -12,8 +12,9 @@ const PROTECTED_PATHS = [
   "/api/onboarding",
   "/api/guide",
   "/api/chat",
+  "/api/github",
 ]
-const AUTH_PATHS = ["/sign-in", "/sign-up"]
+const AUTH_PATHS = ["/sign-in"]
 
 function getSecret(): Uint8Array {
   return new TextEncoder().encode(process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod")
