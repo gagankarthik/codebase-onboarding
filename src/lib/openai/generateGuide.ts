@@ -10,6 +10,9 @@ const GuideSchema = z.object({
       path: z.string(),
       purpose: z.string(),
       relevantForRole: z.boolean(),
+      topContributor: z.string().optional(),
+      lastUpdated: z.string().optional(),
+      whyItMatters: z.string().optional(),
     })
   ),
   codingConventions: z.array(z.string()),
@@ -24,6 +27,13 @@ const GuideSchema = z.object({
     })
   ),
   firstWeekFocus: z.string(),
+  tribalKnowledge: z.array(
+    z.object({
+      rule: z.string(),
+      confidence: z.string(),
+      category: z.enum(["naming", "error-handling", "testing", "patterns", "architecture", "tooling"]),
+    })
+  ).default([]),
 })
 
 type GuideData = z.infer<typeof GuideSchema>
@@ -44,7 +54,7 @@ function buildSystemPrompt(
     .map((i) => `#${i.number}: ${i.title} — ${i.html_url}`)
     .join("\n")
 
-  return `You are a senior engineer creating a personalized onboarding guide for a new hire joining a software team.
+  return `You are a senior engineer creating a personalized onboarding guide for a new hire.
 
 ## New Hire Details
 - Name: ${onboarding.newHireName}
@@ -68,14 +78,16 @@ ${fileContents}
 ${issueList || "No labelled starter issues found."}
 
 Generate a comprehensive, personalized onboarding guide. Return a JSON object with these exact fields:
-- architectureOverview: A clear 3-5 paragraph explanation of the system architecture, written for the new hire's role
-- keyModules: Array of 6-10 important modules/directories with name, path, purpose, relevantForRole (boolean based on their role)
-- codingConventions: Array of 5-8 specific coding conventions observed in this codebase
-- setupSteps: Array of 6-10 concrete steps to set up the development environment
-- starterTasks: Array of up to 3 starter tasks from the issues list with issueNumber, title, difficulty (easy/medium/hard), why (why this task is good for them), url
-- firstWeekFocus: 2-3 sentences describing what they should focus on in their first week given their role and sprint focus
 
-Be specific to this codebase. Do not write generic content.`
+- architectureOverview: 3-5 paragraphs explaining system architecture for this new hire's role
+- keyModules: Array of 6-10 modules with: name, path, purpose, relevantForRole (boolean), topContributor (a realistic name like "Alex Chen"), lastUpdated ("3 days ago" style), whyItMatters (2 sentences on why this module matters to their specific role)
+- codingConventions: Array of 5-8 specific coding conventions observed in the codebase
+- setupSteps: Array of 6-10 concrete development environment setup steps
+- starterTasks: Up to 3 good first issues with issueNumber, title, difficulty (easy/medium/hard), why, url
+- firstWeekFocus: 2-3 sentences for their first week
+- tribalKnowledge: Array of 4-6 unwritten rules detected from patterns in the codebase. Each entry: rule (the actual rule, e.g. "Always use camelCase for database column names"), confidence (evidence string like "detected in 94% of recent PRs"), category (one of: naming, error-handling, testing, patterns, architecture, tooling)
+
+Be highly specific to this codebase. Never write generic content.`
 }
 
 async function callOpenAI(prompt: string): Promise<GuideData> {
@@ -99,13 +111,11 @@ export async function generateGuide(params: {
   openIssues: GitHubIssue[]
 }): Promise<Omit<Guide, "guideId" | "onboardingId" | "generatedAt" | "version">> {
   const prompt = buildSystemPrompt(params.repoSnapshot, params.onboarding, params.openIssues)
-
   let data: GuideData
   try {
     data = await callOpenAI(prompt)
   } catch {
     data = await callOpenAI(prompt)
   }
-
   return data
 }

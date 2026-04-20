@@ -13,7 +13,7 @@ function retrieveRelevantFiles(
   })
   return scored
     .sort((a, b) => b.score - a.score)
-    .slice(0, 4)
+    .slice(0, 5)
     .map((s) => s.file)
 }
 
@@ -21,8 +21,9 @@ export async function streamChat(params: {
   question: string
   repoSnapshot: RepoSnapshot
   conversationHistory: ChatMessage[]
+  role?: string
 }): Promise<ReadableStream> {
-  const { question, repoSnapshot, conversationHistory } = params
+  const { question, repoSnapshot, conversationHistory, role } = params
   const client = getOpenAIClient()
 
   const relevantFiles = retrieveRelevantFiles(question, repoSnapshot)
@@ -30,10 +31,17 @@ export async function streamChat(params: {
     .map((f) => `=== ${f.path} ===\n${f.content.slice(0, 3000)}`)
     .join("\n\n")
 
-  const systemPrompt = `You are a helpful engineering assistant with deep knowledge of the ${repoSnapshot.metadata.fullName} codebase.
-Answer questions accurately and concisely. Reference specific files and line patterns when relevant.
-When showing code, use markdown code blocks with the appropriate language tag.
+  const citedPaths = relevantFiles.map((f) => f.path)
+
+  const systemPrompt = `You are a helpful engineering assistant with deep knowledge of the ${repoSnapshot.metadata.fullName} codebase.${role ? ` You are helping a ${role}.` : ""}
+
+Answer questions accurately and concisely. Reference specific files and patterns when relevant.
+When showing code, use markdown code blocks with the appropriate language.
 When mentioning file paths, wrap them in backticks.
+
+At the end of every response, add a "Sources" section in this exact format (only include paths you actually referenced):
+---
+📎 Sources: \`${citedPaths.slice(0, 3).join("\`")}\`
 
 ## Relevant Code Context
 ${context}`
@@ -65,6 +73,12 @@ ${context}`
           controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\n`))
         }
       }
+      // Emit the citation paths as a final event
+      controller.enqueue(
+        new TextEncoder().encode(
+          `data: ${JSON.stringify({ citations: citedPaths })}\n\n`
+        )
+      )
       controller.enqueue(new TextEncoder().encode("data: [DONE]\n\n"))
       controller.close()
     },

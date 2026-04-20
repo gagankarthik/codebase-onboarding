@@ -1,567 +1,754 @@
-'use client';
+// app/page.tsx
+import { ArrowRight, Zap, Shield, MessageSquare, Users, CheckCircle2, ChevronRight, Star, GitBranch, Code2, Sparkles, ArrowUpRight, Play, Pause, Terminal, Brackets, GitMerge, Box, Layers, Workflow, Cpu, Globe, Lock, BarChart3, Clock, TrendingUp, Menu, X, GitBranchIcon } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import {
-  ArrowRight,
-  CheckCircle2,
-  ChevronRight,
-  Code2,
-  GitBranch,
-  Menu,
-  MessageCircle,
-  Rocket,
-  Sparkles,
-  Users,
-  X,
-  Zap,
-  Building2,
-} from 'lucide-react';
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
-
-// --- Data ---
-const STATS = [
-  { label: 'Time to first meaningful PR', value: '1–3 mo', note: 'Industry average (Cortex 2024)' },
-  { label: 'Cost to replace a developer', value: '$77K', note: 'Direct cost + lost velocity' },
-  { label: 'Onboarding time reduction', value: '80%', note: '4 weeks → 3 days with AI' },
-  { label: 'Senior dev hours lost', value: '15–20h', note: 'Per new hire, per cycle' },
-];
-
-const TIMELINE_STAGES = [
-  { week: 'Week 1', title: 'Environment Hell', description: '2–5 days fighting local setup. Senior devs pulled away 8–12 times. New hire feels lost.', color: 'error' },
-  { week: 'Weeks 2–3', title: 'Codebase Archaeology', description: 'Reading code with no context. Confluence docs are 18 months old. 60%+ of day spent reading.', color: 'error' },
-  { week: 'Weeks 4–5', title: 'First PR (Finally)', description: 'Small bug fix gets rejected twice. 23% of new hires mentally check out.', color: 'warning' },
-  { week: 'Weeks 6–7', title: 'Starting to Get It', description: 'Still asking daily questions. Tribal knowledge bottlenecks progress.', color: 'warning' },
-  { week: 'Week 8+', title: 'Partial Productivity', description: 'Full productivity takes 3–6 months. $15–40K wasted per hire.', color: 'success' },
-];
-
-const FEATURE_COMPARISON = [
-  { feature: 'Zero writing needed', mintlify: false, swimm: false, confluence: false, yours: true },
-  { feature: 'Auto-reads GitHub repo', mintlify: 'partial', swimm: true, confluence: false, yours: true },
-  { feature: 'Built for new hire onboarding', mintlify: false, swimm: 'partial', confluence: false, yours: true },
-  { feature: 'Personalised by role/team', mintlify: false, swimm: false, confluence: false, yours: true },
-  { feature: 'Chat with your codebase', mintlify: 'partial', swimm: false, confluence: 'partial', yours: true },
-  { feature: 'Auto-updates as code changes', mintlify: 'partial', swimm: true, confluence: false, yours: true },
-  { feature: 'Starter task suggestions', mintlify: false, swimm: false, confluence: false, yours: true },
-];
-
-const PRICING_TIERS = [
-  { name: 'Starter', price: 49, description: 'Up to 5 seats · 1 repo', features: ['Full codebase tour generation', 'Chat with your codebase', 'Role-based personalisation', 'Manual refresh on demand', '1 active onboarding at a time'], cta: 'Start free trial', highlighted: false },
-  { name: 'Growth', price: 99, description: 'Up to 20 seats · 3 repos', features: ['Everything in Starter', 'Auto-updates on every push', 'Unlimited concurrent onboardings', 'Starter task suggestions', 'Onboarding progress tracking', 'Slack notifications'], cta: 'Start free trial', highlighted: true, popular: true },
-  { name: 'Scale', price: 249, description: 'Unlimited seats · Unlimited repos', features: ['Everything in Growth', 'Multi-repo architecture maps', 'Custom onboarding checklists', 'Time-to-first-PR analytics', 'Priority support + onboarding call', 'SSO / SAML'], cta: 'Contact sales', highlighted: false },
-];
-
-const MRR_DATA = [
-  { month: 'M1', mrr: 490 },
-  { month: 'M2', mrr: 1500 },
-  { month: 'M3', mrr: 3500 },
-  { month: 'M4', mrr: 7000 },
-  { month: 'M5', mrr: 12000 },
-  { month: 'M6', mrr: 18000 },
-  { month: 'M7', mrr: 26000 },
-  { month: 'M8', mrr: 35000 },
-  { month: 'M9', mrr: 44000 },
-  { month: 'M10', mrr: 52000 },
-  { month: 'M11', mrr: 61000 },
-  { month: 'M12', mrr: 68000 },
-];
-
-// --- UI Components ---
-const SectionHeader = ({ label, title, description }: { label: string; title: string; description?: string }) => (
-  <div className="text-center max-w-2xl mx-auto mb-10">
-    <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary-subtle px-3 py-1 text-xs font-medium text-primary mb-4">
-      {label}
-    </div>
-    <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-3">{title}</h2>
-    {description && <p className="text-base text-foreground-muted leading-relaxed">{description}</p>}
-  </div>
-);
-
-// --- Main Component ---
 export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [email, setEmail] = useState('');
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0A0A0B] text-white">
+      {/* Animated Grid Background */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0d_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0d_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/40 via-transparent to-purple-950/40" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[128px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px]" />
+      </div>
+
       {/* Navigation */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Code2 className="w-4 h-4 text-primary-foreground" />
+      <nav className="relative z-50 border-b border-white/[0.06] bg-[#0A0A0B]/80 backdrop-blur-xl">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-18">
+            <div className="flex items-center gap-12">
+              <Link href="/" className="flex items-center gap-3 group">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative h-9 w-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-2xl shadow-indigo-500/20">
+                    <Terminal className="h-5 w-5 text-white" />
+                  </div>
+                </div>
+                <span className="font-bold text-white text-xl tracking-tight">OnboardAI</span>
+              </Link>
+              
+              <div className="hidden lg:flex items-center gap-1">
+                {['Product', 'Solutions', 'Enterprise', 'Docs', 'Pricing'].map((item) => (
+                  <Link 
+                    key={item}
+                    href={`/${item.toLowerCase()}`} 
+                    className="px-4 py-2 text-sm font-medium text-white/60 hover:text-white transition-colors relative group"
+                  >
+                    {item}
+                    <span className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                ))}
               </div>
-              <span className="font-bold text-base text-foreground">Codebase Onboarding</span>
             </div>
-            <nav className="hidden md:flex items-center gap-6">
-              {['How it works', 'Pricing', 'Customers'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase().replace(/ /g, '-')}`} className="text-sm text-foreground-muted hover:text-foreground transition-colors">
-                  {item}
-                </a>
-              ))}
-            </nav>
-            <div className="hidden md:flex items-center gap-3">
-              <Link href="/sign-in" className="text-sm text-foreground-muted hover:text-foreground transition-colors">
-                Sign in
+            
+            <div className="flex items-center gap-3">
+              <Link 
+                href="/login" 
+                className="hidden sm:block text-sm font-medium text-white/70 hover:text-white transition-colors px-4 py-2"
+              >
+                Sign In
               </Link>
-              <Link href="/sign-up" className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover transition-colors">
-                Get started <ArrowRight className="w-3.5 h-3.5" />
+              <div className="h-5 w-px bg-white/10 hidden sm:block" />
+              <Link 
+                href="/signup" 
+                className="relative group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg blur-md opacity-70 group-hover:opacity-100 transition-opacity" />
+                <span className="relative block text-sm font-medium text-white bg-white/10 border border-white/20 backdrop-blur-sm px-5 py-2.5 rounded-lg group-hover:bg-white/15 transition-all">
+                  Get Started
+                  <ArrowRight className="inline-block ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </span>
               </Link>
             </div>
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-foreground-muted">
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
           </div>
         </div>
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-background border-b border-border p-4">
-            <div className="flex flex-col gap-3">
-              {['How it works', 'Pricing', 'Customers'].map((item) => (
-                <a key={item} href="#" className="text-sm text-foreground-muted py-1.5">{item}</a>
-              ))}
-              <hr className="border-border my-1" />
-              <Link href="/sign-in" className="text-sm text-foreground-muted py-1.5">Sign in</Link>
-              <Link href="/sign-up" className="bg-primary text-primary-foreground py-2 rounded-full text-sm text-center font-medium">
-                Get started
-              </Link>
-            </div>
-          </div>
-        )}
-      </header>
+      </nav>
 
-      <main className="overflow-hidden">
-        {/* Hero Section */}
-        <section className="relative pt-16 pb-24 overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary-subtle via-background to-background" />
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-subtle px-4 py-1.5 text-sm text-primary mb-8">
-              <Sparkles className="h-3.5 w-3.5" />
-              Powered by GPT-4o mini · Reads your actual codebase
-            </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground max-w-4xl mx-auto mb-6 leading-[1.1]">
-              New hires ship their{' '}
-              <span className="bg-gradient-to-r from-primary to-[oklch(0.59_0.243_290)] bg-clip-text text-transparent">
-                first PR in days
-              </span>
-              {' '}not months
-            </h1>
-            <p className="text-lg md:text-xl text-foreground-muted max-w-2xl mx-auto mb-10 leading-relaxed">
-              Connect your GitHub repo. AI reads the codebase and generates a personalised, interactive
-              onboarding guide for every new engineer — role-specific, always up to date.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/sign-up" className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary-hover transition-colors">
-                Start for free <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a href="#how-it-works" className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-6 py-3 text-base font-medium text-foreground hover:bg-background-muted transition-colors">
-                See how it works
-              </a>
-            </div>
-            <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-foreground-muted">
-              {[
-                { icon: GitBranch, label: 'Connect GitHub repo' },
-                { icon: Zap, label: 'AI scans & generates' },
-                { icon: Users, label: 'Personalised by role' },
-                { icon: MessageCircle, label: 'Chat with codebase' },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-primary" />
-                  {label}
+      {/* Hero Section */}
+      <section className="relative z-10 pt-28 pb-20 px-6 lg:px-8 overflow-hidden">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Column - Text Content */}
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 mb-8">
+                <div className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+                <span className="text-xs font-medium text-white/80 tracking-wide">PRIVATE BETA — 200+ DEVELOPERS ONBOARDED</span>
+                <ArrowUpRight className="h-3 w-3 text-white/40" />
+              </div>
+              
+              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+                <span className="block text-white">Ship your first PR</span>
+                <span className="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  in days, not months
+                </span>
+              </h1>
+              
+              <p className="text-lg text-white/60 max-w-xl mb-10 leading-relaxed">
+                OnboardAI reads your GitHub repository and generates a living, interactive guide 
+                that helps new engineers understand your codebase and start contributing immediately.
+              </p>
 
-        {/* Stats Grid */}
-        <section className="py-16 bg-background-subtle border-y border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {STATS.map((stat, idx) => (
-                <div key={idx} className="rounded-xl border border-border bg-card p-6 text-center">
-                  <div className="text-xs font-medium text-foreground-muted mb-2">{stat.label}</div>
-                  <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
-                  <div className="text-xs text-foreground-subtle">{stat.note}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                <Link href="/signup" className="group relative inline-flex items-center">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur-xl opacity-70 group-hover:opacity-100 transition-opacity" />
+                  <span className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium px-8 py-4 rounded-xl flex items-center gap-3 shadow-2xl shadow-indigo-600/20">
+                    Start building today
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Link>
+                
+                <Link href="#demo" className="group relative inline-flex items-center">
+                  <span className="relative bg-white/5 backdrop-blur-sm border border-white/10 text-white font-medium px-8 py-4 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-all">
+                    <Play className="h-5 w-5" />
+                    Watch demo
+                    <span className="text-white/40 text-xs ml-2">2:45</span>
+                  </span>
+                </Link>
+              </div>
 
-        {/* Insight Box */}
-        <section className="py-16" id="how-it-works">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="rounded-2xl border border-primary/20 bg-primary-subtle p-6 md:p-8">
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary">
-                  <Building2 className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <p className="text-base text-foreground leading-relaxed">
-                  <strong>The gap nobody has filled:</strong>{' '}
-                  Mintlify and Swimm solve public-facing docs and inline code comments.
-                  Nobody has built a tool that auto-generates a new hire&apos;s first-week experience — an
-                  interactive, personalised walkthrough of the actual codebase they&apos;re joining.
-                  That&apos;s a completely different problem, and a completely different buyer.
-                </p>
+              {/* Metrics */}
+              <div className="flex flex-wrap gap-8 pt-8 border-t border-white/[0.06]">
+                {[
+                  { value: '80%', label: 'Faster onboarding', sub: 'vs industry average' },
+                  { value: '3-5', label: 'Days to first PR', sub: 'down from 4-8 weeks' },
+                  { value: '15-20h', label: 'Senior dev time saved', sub: 'per new hire' },
+                ].map((metric, i) => (
+                  <div key={i}>
+                    <div className="text-3xl font-bold text-white tracking-tight">{metric.value}</div>
+                    <div className="text-sm font-medium text-white/80 mt-1">{metric.label}</div>
+                    <div className="text-xs text-white/40 mt-0.5">{metric.sub}</div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Pain Timeline */}
-        <section className="py-16 bg-background">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="The Problem"
-              title="What actually happens during a developer's first 8 weeks"
-              description="Without the right tools, onboarding is slow, painful, and expensive."
-            />
-            <div className="rounded-2xl border border-border overflow-hidden">
-              {TIMELINE_STAGES.map((stage, idx) => (
-                <div
-                  key={idx}
-                  className={`flex flex-col sm:flex-row border-b border-border last:border-b-0 ${
-                    stage.color === 'error'
-                      ? 'bg-destructive-subtle/40'
-                      : stage.color === 'warning'
-                      ? 'bg-warning-subtle/40'
-                      : 'bg-success-subtle/40'
-                  }`}
-                >
-                  <div className="sm:w-32 p-4 border-b sm:border-b-0 sm:border-r border-border flex sm:flex-col items-center justify-center gap-2 sm:gap-0">
-                    <span className="text-xs font-medium text-foreground-muted">Period</span>
-                    <span
-                      className={`text-sm font-bold ${
-                        stage.color === 'error'
-                          ? 'text-destructive'
-                          : stage.color === 'warning'
-                          ? 'text-warning-foreground'
-                          : 'text-success'
-                      }`}
-                    >
-                      {stage.week}
+            {/* Right Column - Interactive Demo */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-3xl blur-3xl" />
+              
+              <div className="relative bg-[#131316] border border-white/10 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
+                {/* Window Header */}
+                <div className="flex items-center justify-between px-4 py-3 bg-[#1A1A1E] border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="h-3 w-3 rounded-full bg-rose-500/80" />
+                      <div className="h-3 w-3 rounded-full bg-amber-500/80" />
+                      <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
+                    </div>
+                    <span className="ml-3 text-xs font-mono text-white/40">onboardai ~/codebase/guide</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">
+                      LIVE DEMO
                     </span>
                   </div>
-                  <div className="flex-1 p-4">
-                    <h3 className="font-semibold text-foreground mb-1">{stage.title}</h3>
-                    <p className="text-foreground-muted text-sm">{stage.description}</p>
-                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
-        {/* How It Works Flow */}
-        <section className="py-16 bg-background-subtle" id="how-it-works">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="The Solution"
-              title="From repo connect to first PR in under a week"
-              description="Five steps. Zero writing. Completely automated."
-            />
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-              {[
-                { step: 'Connect GitHub', icon: GitBranch },
-                { step: 'AI scans repo', icon: Zap },
-                { step: 'Generate guide', icon: Sparkles },
-                { step: 'Chat & learn', icon: MessageCircle },
-                { step: 'Ship first PR', icon: Rocket },
-              ].map(({ step, icon: Icon }, idx) => (
-                <div key={idx} className="relative rounded-xl border border-border bg-card p-4 text-center">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-subtle text-primary mx-auto mb-3">
-                    <Icon className="h-4 w-4" />
+                {/* Demo Content */}
+                <div className="p-5 space-y-4">
+                  {/* Repository Header */}
+                  <div className="flex items-center gap-3 pb-3 border-b border-white/10">
+                    <GitBranch className="h-4 w-4 text-indigo-400" />
+                    <span className="text-sm font-mono text-white/80">acme/api-service</span>
+                    <span className="text-xs text-white/30">main</span>
+                    <span className="ml-auto text-xs text-white/40 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      Scanned 2 min ago
+                    </span>
                   </div>
-                  <div className="text-xs font-medium text-foreground-muted mb-1">Step {idx + 1}</div>
-                  <div className="font-semibold text-foreground text-sm">{step}</div>
-                  {idx < 4 && (
-                    <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 text-foreground-subtle z-10">
-                      <ChevronRight className="w-4 h-4" />
+
+                  {/* Architecture Summary */}
+                  <div className="bg-[#0A0A0C] rounded-lg p-4 border border-white/5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Box className="h-4 w-4 text-purple-400" />
+                      <span className="text-xs font-semibold uppercase tracking-wider text-white/50">Architecture Overview</span>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 rounded-xl border border-border bg-card p-6">
-              <p className="text-foreground-muted text-center text-sm leading-relaxed">
-                The output isn&apos;t just docs. It&apos;s a{' '}
-                <strong className="text-foreground">personalised Day 1 experience</strong>:{' '}
-                &ldquo;Here are the 5 modules you&apos;ll touch most. Here&apos;s the team&apos;s coding convention.
-                Here are 3 starter tasks ranked by difficulty.&rdquo;
-              </p>
-            </div>
-          </div>
-        </section>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      <span className="text-white">Modular monolith</span> with clear service boundaries. 
+                      Core modules: <span className="font-mono text-xs bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded">auth</span>, 
+                      <span className="font-mono text-xs bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded ml-1">api</span>, 
+                      <span className="font-mono text-xs bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded ml-1">database</span>.
+                      <span className="block mt-2 text-white/50">Built with TypeScript, Express, PostgreSQL.</span>
+                    </p>
+                  </div>
 
-        {/* Competitive Landscape */}
-        <section className="py-16 bg-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="Market Landscape"
-              title="Why the gap exists"
-              description="Existing tools solve different problems. We're building something new."
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { name: 'Mintlify', pricing: '$300/mo · API docs', gap: 'Requires manual MDX writing. Buyer is DevRel, not the engineering manager. Not for onboarding.' },
-                { name: 'Swimm', pricing: 'Free + paid · Code-linked docs', gap: "Devs must write the docs first. Keeps them synced, but won't generate them for you." },
-                { name: 'Confluence / Notion', pricing: '$5–15/user · Generic wikis', gap: 'Always out of date. No live code connection. The engineering graveyard.' },
-              ].map((comp) => (
-                <div key={comp.name} className="rounded-xl border border-border bg-card p-5">
-                  <h3 className="font-semibold text-foreground">{comp.name}</h3>
-                  <p className="text-xs text-foreground-muted mt-1">{comp.pricing}</p>
-                  <div className="mt-4 text-xs font-medium text-warning-foreground">The gap:</div>
-                  <p className="mt-1 text-sm text-foreground-muted">{comp.gap}</p>
+                  {/* Module Radar */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { name: 'auth', percentage: 94, color: 'indigo', desc: 'JWT + OAuth2' },
+                      { name: 'api', percentage: 88, color: 'purple', desc: 'REST + GraphQL' },
+                      { name: 'database', percentage: 76, color: 'emerald', desc: 'Prisma ORM' },
+                      { name: 'queue', percentage: 62, color: 'amber', desc: 'Bull + Redis' },
+                    ].map((module) => (
+                      <div key={module.name} className="bg-[#0A0A0C] rounded-lg p-3 border border-white/5 hover:border-white/10 transition-all cursor-pointer">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-medium text-white/70">{module.name}</span>
+                          <span className="text-[10px] text-white/30">{module.percentage}% match</span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full bg-gradient-to-r ${
+                              module.color === 'indigo' ? 'from-indigo-500 to-indigo-400' :
+                              module.color === 'purple' ? 'from-purple-500 to-purple-400' :
+                              module.color === 'emerald' ? 'from-emerald-500 to-emerald-400' :
+                              'from-amber-500 to-amber-400'
+                            } rounded-full`}
+                            style={{ width: `${module.percentage}%` }}
+                          />
+                        </div>
+                        <p className="text-[10px] text-white/40 mt-1.5">{module.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Tribal Knowledge */}
+                  <div className="bg-gradient-to-r from-indigo-950/50 to-purple-950/50 rounded-lg p-4 border border-indigo-500/20">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles className="h-4 w-4 text-indigo-400" />
+                      <span className="text-xs font-semibold uppercase tracking-wider text-indigo-300">Tribal Knowledge Unlocked</span>
+                    </div>
+                    <div className="space-y-2">
+                      {[
+                        { rule: 'Always use async/await — no raw promises', confidence: 98 },
+                        { rule: 'PR titles must follow Conventional Commits', confidence: 94 },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <span className="text-xs text-white/80">{item.rule}</span>
+                            <span className="text-[10px] text-white/30 ml-2">{item.confidence}% confidence</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Chat Preview */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <div className="flex-1 relative">
+                      <input 
+                        type="text" 
+                        placeholder="Ask anything about this codebase..."
+                        className="w-full bg-[#0A0A0C] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                      />
+                      <MessageSquare className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                    </div>
+                    <button className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-4 py-2.5 rounded-lg transition-colors">
+                      Ask
+                    </button>
+                  </div>
                 </div>
-              ))}
-              <div className="rounded-xl border border-primary bg-primary-subtle p-5">
-                <h3 className="font-semibold text-foreground">Codebase Onboarding</h3>
-                <p className="text-xs text-primary font-medium mt-1">$49–99/mo · Onboarding-first</p>
-                <div className="mt-4 text-xs font-medium text-primary">Our advantage:</div>
-                <p className="mt-1 text-sm text-foreground-muted">
-                  Zero writing required. Reads your GitHub repo. Generates personalised guides per role. Built for the engineering manager.
-                </p>
+              </div>
+
+              {/* Floating Elements */}
+              <div className="absolute -top-6 -right-6 bg-[#131316] border border-white/10 rounded-lg p-3 shadow-xl backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <Code2 className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium text-white">First PR ready</div>
+                    <div className="text-[10px] text-emerald-400">3 starter tasks available</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-4 -left-6 bg-[#131316] border border-white/10 rounded-lg px-4 py-2 shadow-xl backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-white/50" />
+                  <span className="text-xs text-white/70">
+                    <span className="font-medium text-white">12</span> engineers onboarded this week
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Feature Comparison Table */}
-        <section className="py-16 bg-background-subtle" id="pricing">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="Feature Comparison"
-              title="Where we win"
-              description="The complete advantage across every dimension that matters for engineering onboarding."
-            />
-            <div className="overflow-x-auto rounded-xl border border-border bg-card">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Feature</th>
-                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Mintlify</th>
-                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Swimm</th>
-                    <th className="text-left py-3 px-4 font-medium text-foreground-muted">Confluence</th>
-                    <th className="py-3 px-4 font-semibold text-primary text-left bg-primary-subtle/50">
-                      Our Tool
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {FEATURE_COMPARISON.map((item, idx) => (
-                    <tr key={idx} className="border-b border-border last:border-0">
-                      <td className="py-3 px-4 font-medium text-foreground">{item.feature}</td>
-                      {(['mintlify', 'swimm', 'confluence'] as const).map((key) => (
-                        <td key={key} className="py-3 px-4">
-                          {item[key] === true ? (
-                            <CheckCircle2 className="w-4 h-4 text-success" />
-                          ) : item[key] === false ? (
-                            <div className="w-4 h-4 rounded-full border border-border-strong" />
-                          ) : (
-                            <span className="text-xs text-warning-foreground font-medium">Partial</span>
-                          )}
-                        </td>
-                      ))}
-                      <td className="py-3 px-4 bg-primary-subtle/30">
-                        <CheckCircle2 className="w-4 h-4 text-primary" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      {/* Trusted By Marquee */}
+      <section className="relative z-10 py-12 border-y border-white/[0.06] overflow-hidden">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-8">
+          <p className="text-center text-xs font-medium uppercase tracking-wider text-white/30 mb-8">
+            Trusted by engineering teams worldwide
+          </p>
+          <div className="flex items-center justify-around gap-8 opacity-40">
+            {['VERCEL ▲', 'LINEAR', 'SUPABASE', 'PLANETSCALE', 'RAILWAY', 'REPLIT'].map((company) => (
+              <span key={company} className="text-sm font-bold text-white/60 tracking-wide">{company}</span>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* MVP Build Plan — skip this section on landing, replaced by Pricing */}
+      {/* Features - Asymmetric Grid */}
+      <section className="relative z-10 py-28 px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="grid lg:grid-cols-12 gap-6">
+            {/* Feature Card 1 - Large */}
+            <div className="lg:col-span-7 bg-gradient-to-br from-[#131316] to-[#0A0A0C] border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500 group">
+              <div className="flex items-start justify-between mb-6">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 border border-indigo-500/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Zap className="h-7 w-7 text-indigo-400" />
+                </div>
+                <span className="text-xs font-mono text-white/20">01</span>
+              </div>
+              <h3 className="text-2xl font-semibold text-white mb-3">Zero manual documentation</h3>
+              <p className="text-white/50 leading-relaxed mb-6">
+                Connect your GitHub repository and watch as OnboardAI analyzes commits, PRs, and code structure 
+                to generate a comprehensive, always-up-to-date guide for every new hire.
+              </p>
+              <div className="bg-black/30 rounded-xl p-4 border border-white/5">
+                <div className="flex items-center gap-2 text-xs text-white/40 mb-2">
+                  <Terminal className="h-3 w-3" />
+                  <span>Connected repositories update automatically</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-1.5 flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" />
+                  <span className="text-xs text-white/30">Live sync enabled</span>
+                </div>
+              </div>
+            </div>
 
-        {/* Pricing Section */}
-        <section className="py-16 bg-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="Simple, Transparent Pricing"
-              title="Choose the plan that fits your team"
-              description="No per-seat surprises. Flat monthly pricing that scales with your team."
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {PRICING_TIERS.map((tier) => (
-                <div
-                  key={tier.name}
-                  className={`relative rounded-2xl border p-6 ${
-                    tier.highlighted
-                      ? 'border-primary bg-primary-subtle'
-                      : 'border-border bg-card'
-                  }`}
-                >
-                  {tier.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                      Most popular
-                    </div>
-                  )}
-                  <div className="text-sm font-semibold text-foreground-muted mb-1">{tier.name}</div>
-                  <div className="text-4xl font-bold text-foreground">
-                    ${tier.price}
-                    <span className="text-base font-normal text-foreground-muted">/mo</span>
+            {/* Feature Card 2 - Medium */}
+            <div className="lg:col-span-5 bg-gradient-to-br from-[#131316] to-[#0A0A0C] border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500 group">
+              <div className="flex items-start justify-between mb-6">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Users className="h-7 w-7 text-purple-400" />
+                </div>
+                <span className="text-xs font-mono text-white/20">02</span>
+              </div>
+              <h3 className="text-2xl font-semibold text-white mb-3">Role-based personalization</h3>
+              <p className="text-white/50 leading-relaxed">
+                Frontend, backend, or full-stack — each new hire receives a tailored onboarding experience 
+                focused on the parts of the codebase they'll actually work with.
+              </p>
+              <div className="mt-6 flex -space-x-2">
+                {['FE', 'BE', 'FS', 'DevOps'].map((role) => (
+                  <div key={role} className="h-10 w-10 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-[#131316] flex items-center justify-center">
+                    <span className="text-xs font-bold text-white/60">{role}</span>
                   </div>
-                  <div className="text-sm text-foreground-muted mt-1 mb-5">{tier.description}</div>
-                  <ul className="space-y-2.5 mb-6">
-                    {tier.features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2 text-sm text-foreground-muted">
-                        <CheckCircle2 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${tier.highlighted ? 'text-primary' : 'text-success'}`} />
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/sign-up"
-                    className={`block w-full py-2.5 rounded-full text-center text-sm font-medium transition-colors ${
-                      tier.highlighted
-                        ? 'bg-primary text-primary-foreground hover:bg-primary-hover'
-                        : 'border border-border text-foreground hover:bg-background-muted'
-                    }`}
-                  >
-                    {tier.cta}
+                ))}
+              </div>
+            </div>
+
+            {/* Feature Card 3 - Medium */}
+            <div className="lg:col-span-5 bg-gradient-to-br from-[#131316] to-[#0A0A0C] border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500 group">
+              <div className="flex items-start justify-between mb-6">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <MessageSquare className="h-7 w-7 text-emerald-400" />
+                </div>
+                <span className="text-xs font-mono text-white/20">03</span>
+              </div>
+              <h3 className="text-2xl font-semibold text-white mb-3">Conversational codebase</h3>
+              <p className="text-white/50 leading-relaxed mb-6">
+                New hires ask questions in plain English and get instant, accurate answers grounded 
+                in your actual codebase — no more Slack interrupts for senior developers.
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-10 bg-black/30 rounded-lg border border-white/10 px-3 flex items-center">
+                  <span className="text-xs text-white/40">"How does auth work?"</span>
+                </div>
+                <div className="h-10 w-10 rounded-lg bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center">
+                  <ArrowRight className="h-4 w-4 text-emerald-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Feature Card 4 - Large */}
+            <div className="lg:col-span-7 bg-gradient-to-br from-indigo-950/30 via-purple-950/30 to-transparent border border-indigo-500/20 rounded-3xl p-8 hover:border-indigo-500/30 transition-all duration-500 group">
+              <div className="flex items-start gap-6">
+                <div>
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/20 border border-amber-500/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <GitBranch className="h-7 w-7 text-amber-400" />
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-semibold text-white mb-3">First PR recommendations</h3>
+                  <p className="text-white/50 leading-relaxed mb-6">
+                    Our AI analyzes open issues and suggests the perfect starter tasks based on complexity, 
+                    impact, and alignment with the new hire's role.
+                  </p>
+                  <Link href="#" className="inline-flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                    See how it works
+                    <ChevronRight className="h-4 w-4" />
                   </Link>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* MRR Growth Chart */}
-        <section className="py-16 bg-background-subtle">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="Financial Projection"
-              title="Realistic MRR growth path"
-              description="Based on lean customer acquisition and validated demand signals."
-            />
-            <div className="rounded-xl border border-border bg-card p-6">
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={MRR_DATA}>
-                    <defs>
-                      <linearGradient id="mrrGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="oklch(0.546 0.243 264.4)" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="oklch(0.546 0.243 264.4)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.914 0.005 264.5)" />
-                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'oklch(0.52 0.025 231)' }} />
-                    <YAxis tick={{ fontSize: 11, fill: 'oklch(0.52 0.025 231)' }} tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} />
-                    <Tooltip
-                      formatter={(value) => [`$${Number(value).toLocaleString()}`, 'MRR']}
-                      contentStyle={{ borderRadius: '8px', border: '1px solid oklch(0.914 0.005 264.5)', background: 'oklch(1 0 0)' }}
-                    />
-                    <Area type="monotone" dataKey="mrr" stroke="oklch(0.546 0.243 264.4)" strokeWidth={2} fill="url(#mrrGradient)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              <p className="mt-4 text-center text-xs text-foreground-muted">
-                Projected MRR growth from $490 to $68,000 over 12 months
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* GTM Strategy */}
-        <section className="py-16 bg-background" id="customers">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader
-              label="Go-to-Market"
-              title="How we reach the first 50 customers"
-              description="Targeted channels where engineering managers are already feeling this pain."
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { icon: Users, title: 'YC Slack & Hacker News', body: 'YC companies are always hiring. A Show HN post reaches hundreds of engineering managers who live this problem daily.' },
-                { icon: Building2, title: 'LinkedIn Cold Outreach', body: 'Target CTOs at 10–100 person companies that posted engineering jobs in the last 30 days. The pain is live and acute.' },
-                { icon: Rocket, title: 'Build in Public', body: 'Post on Dev Twitter. "Day 14: generated a 30-page onboarding guide for a 50-file codebase in 4 minutes."' },
-              ].map(({ icon: Icon, title, body }) => (
-                <div key={title} className="rounded-xl border border-border bg-card p-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-subtle mb-4">
-                    <Icon className="h-5 w-5 text-primary" />
+                <div className="hidden xl:block flex-1">
+                  <div className="space-y-3">
+                    {[
+                      { issue: 'fix: Update README with setup steps', difficulty: 'Easy', time: '~30 min' },
+                      { issue: 'feat: Add input validation to auth flow', difficulty: 'Medium', time: '~2 hrs' },
+                      { issue: 'refactor: Extract API client to shared module', difficulty: 'Medium', time: '~3 hrs' },
+                    ].map((task, i) => (
+                      <div key={i} className="bg-black/30 rounded-lg p-3 border border-white/5 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs text-white/70 block mb-1">{task.issue}</span>
+                          <span className="text-[10px] text-white/30">{task.time}</span>
+                        </div>
+                        <span className={`text-[10px] px-2 py-0.5 rounded ${
+                          task.difficulty === 'Easy' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+                          'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        }`}>
+                          {task.difficulty}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">{title}</h3>
-                  <p className="text-foreground-muted text-sm leading-relaxed">{body}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works - Timeline Style */}
+      <section className="relative z-10 py-28 px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-950/10 to-transparent">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 mb-6">
+              <Workflow className="h-3.5 w-3.5 text-indigo-400" />
+              <span className="text-xs font-medium text-white/60 tracking-wide">HOW IT WORKS</span>
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">
+              From zero to first PR in minutes
+            </h2>
+            <p className="text-lg text-white/40 max-w-2xl mx-auto">
+              No complex setup. No manual documentation. Just connect and watch the magic happen.
+            </p>
+          </div>
+
+          <div className="relative max-w-5xl mx-auto">
+            {/* Timeline Line */}
+            <div className="absolute left-8 lg:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500 via-purple-500 to-transparent hidden lg:block" />
+            
+            <div className="space-y-12">
+              {[
+                {
+                  step: '01',
+                  title: 'Connect your repository',
+                  description: 'Authenticate with GitHub in one click. Select the repository and branch you want to analyze.',
+                  icon: <GitBranchIcon className="h-6 w-6" />,
+                  color: 'indigo'
+                },
+                {
+                  step: '02',
+                  title: 'AI analyzes your codebase',
+                  description: 'Our AI scans commits, PRs, code structure, and documentation to build a comprehensive knowledge graph.',
+                  icon: <Cpu className="h-6 w-6" />,
+                  color: 'purple'
+                },
+                {
+                  step: '03',
+                  title: 'Generate personalized guide',
+                  description: 'Within minutes, OnboardAI creates an interactive onboarding guide tailored to your new hire\'s role.',
+                  icon: <Layers className="h-6 w-6" />,
+                  color: 'emerald'
+                },
+                {
+                  step: '04',
+                  title: 'New hire ships first PR',
+                  description: 'Armed with context and recommended starter tasks, new engineers start contributing on day one.',
+                  icon: <GitMerge className="h-6 w-6" />,
+                  color: 'amber'
+                },
+              ].map((item, i) => (
+                <div key={i} className={`relative flex flex-col lg:flex-row gap-8 ${i % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+                  <div className="flex lg:w-1/2 lg:justify-end">
+                    <div className={`lg:w-[calc(50%-2rem)] ${i % 2 === 1 ? 'lg:ml-auto' : ''}`}>
+                      <div className="bg-gradient-to-br from-[#131316] to-[#0A0A0C] border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${
+                            item.color === 'indigo' ? 'from-indigo-500/20 to-indigo-600/20 border-indigo-500/30' :
+                            item.color === 'purple' ? 'from-purple-500/20 to-purple-600/20 border-purple-500/30' :
+                            item.color === 'emerald' ? 'from-emerald-500/20 to-emerald-600/20 border-emerald-500/30' :
+                            'from-amber-500/20 to-amber-600/20 border-amber-500/30'
+                          } border flex items-center justify-center`}>
+                            <div className={
+                              item.color === 'indigo' ? 'text-indigo-400' :
+                              item.color === 'purple' ? 'text-purple-400' :
+                              item.color === 'emerald' ? 'text-emerald-400' :
+                              'text-amber-400'
+                            }>
+                              {item.icon}
+                            </div>
+                          </div>
+                          <span className="text-3xl font-bold text-white/10 tracking-wider">{item.step}</span>
+                        </div>
+                        <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
+                        <p className="text-white/50 text-sm leading-relaxed">{item.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lg:w-1/2" />
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA Banner */}
-        <section className="py-20 bg-gradient-to-br from-[oklch(0.3_0.243_264.4)] to-[oklch(0.165_0.2_264.4)]">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
-              Ready to fix engineering onboarding?
+      {/* Pricing - Enterprise Focus */}
+      <section className="relative z-10 py-28 px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 mb-6">
+              <BarChart3 className="h-3.5 w-3.5 text-indigo-400" />
+              <span className="text-xs font-medium text-white/60 tracking-wide">PRICING</span>
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">
+              Simple pricing, enterprise ready
             </h2>
-            <p className="text-white/70 text-lg mb-10 leading-relaxed">
-              Join teams already onboarding engineers 80% faster. Get your first guide generated in minutes.
+            <p className="text-lg text-white/40 max-w-2xl mx-auto">
+              Start with a free trial. Scale as your team grows.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your work email"
-                className="px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 sm:w-72 text-sm"
-              />
-              <Link href="/sign-up" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[oklch(0.3_0.243_264.4)] hover:bg-white/90 transition-colors">
-                Get started free <ArrowRight className="h-4 w-4" />
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {[
+              {
+                name: 'Starter',
+                price: '49',
+                description: 'Perfect for small teams getting started',
+                features: ['Up to 5 seats', '1 repository', 'Full codebase tour', 'Chat with your codebase', 'Role-based personalization'],
+                cta: 'Start free trial',
+                popular: false
+              },
+              {
+                name: 'Pro',
+                price: '99',
+                description: 'For growing teams shipping fast',
+                features: ['Up to 20 seats', '3 repositories', 'Everything in Starter', 'Auto-updates on push', 'Starter task suggestions', 'Slack notifications', 'Priority support'],
+                cta: 'Start free trial',
+                popular: true
+              },
+              {
+                name: 'Enterprise',
+                price: 'Custom',
+                description: 'For large organizations with complex needs',
+                features: ['Unlimited seats', 'Unlimited repositories', 'Everything in Pro', 'SSO / SAML', 'Audit logs', 'Custom integrations', 'Dedicated support', 'SLA guarantee'],
+                cta: 'Contact sales',
+                popular: false
+              },
+            ].map((plan, i) => (
+              <div 
+                key={i} 
+                className={`relative rounded-2xl p-8 ${
+                  plan.popular 
+                    ? 'bg-gradient-to-b from-indigo-950/30 to-transparent border-2 border-indigo-500/50 shadow-2xl shadow-indigo-500/10' 
+                    : 'bg-gradient-to-br from-[#131316] to-[#0A0A0C] border border-white/10'
+                } hover:border-white/20 transition-all duration-300`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-medium px-4 py-1 rounded-full">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                
+                <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
+                <p className="text-sm text-white/40 mb-6">{plan.description}</p>
+                
+                <div className="mb-6">
+                  {plan.price === 'Custom' ? (
+                    <span className="text-4xl font-bold text-white">{plan.price}</span>
+                  ) : (
+                    <>
+                      <span className="text-4xl font-bold text-white">${plan.price}</span>
+                      <span className="text-white/40">/month</span>
+                    </>
+                  )}
+                </div>
+                
+                <Link 
+                  href="/signup" 
+                  className={`block text-center py-3 rounded-lg font-medium mb-8 transition-all ${
+                    plan.popular
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-500/25'
+                      : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+                
+                <ul className="space-y-3">
+                  {plan.features.map((feature, j) => (
+                    <li key={j} className="flex items-start gap-3">
+                      <CheckCircle2 className={`h-5 w-5 flex-shrink-0 mt-0.5 ${
+                        plan.popular ? 'text-indigo-400' : 'text-emerald-400'
+                      }`} />
+                      <span className="text-sm text-white/60">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Enterprise CTA */}
+          <div className="mt-16 max-w-4xl mx-auto bg-gradient-to-r from-indigo-950/30 via-purple-950/30 to-indigo-950/30 border border-indigo-500/20 rounded-2xl p-10 text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Shield className="h-5 w-5 text-indigo-400" />
+              <span className="text-sm font-medium text-indigo-300 tracking-wide">ENTERPRISE READY</span>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-3">Need custom security or compliance features?</h3>
+            <p className="text-white/50 mb-6 max-w-2xl mx-auto">
+              SOC 2 Type II certified, SSO/SAML, audit logs, and dedicated support. We work with your security team.
+            </p>
+            <Link href="/enterprise" className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-white font-medium px-6 py-3 rounded-lg hover:bg-white/10 transition-all">
+              Talk to enterprise sales
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Dashboard */}
+      <section className="relative z-10 py-20 px-6 lg:px-8 border-t border-white/[0.06]">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="grid lg:grid-cols-4 gap-6">
+            {[
+              { value: '80%', label: 'Faster time-to-productivity', trend: '+23% vs industry' },
+              { value: '3.2 days', label: 'Average time to first PR', trend: 'Down from 4-8 weeks' },
+              { value: '18 hours', label: 'Senior dev time saved', trend: 'Per new hire' },
+              { value: '94%', label: 'New hire satisfaction', trend: '+31% vs baseline' },
+            ].map((stat, i) => (
+              <div key={i} className="bg-gradient-to-br from-[#131316] to-[#0A0A0C] border border-white/10 rounded-xl p-6">
+                <div className="text-4xl font-bold text-white mb-1 tracking-tight">{stat.value}</div>
+                <div className="text-sm text-white/60 mb-2">{stat.label}</div>
+                <div className="flex items-center gap-1 text-xs text-emerald-400">
+                  <TrendingUp className="h-3 w-3" />
+                  {stat.trend}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="relative z-10 py-28 px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative bg-gradient-to-r from-indigo-950/50 via-purple-950/50 to-indigo-950/50 border border-indigo-500/30 rounded-3xl p-16 text-center overflow-hidden">
+            
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight relative">
+              Ready to accelerate your<br />developer onboarding?
+            </h2>
+            <p className="text-lg text-white/50 mb-10 max-w-2xl mx-auto relative">
+              Join hundreds of engineering teams who've cut onboarding time by 80% and improved new hire satisfaction.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative">
+              <Link href="/signup" className="group relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur-xl opacity-70 group-hover:opacity-100 transition-opacity" />
+                <span className="relative block bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium px-8 py-4 rounded-xl shadow-2xl shadow-indigo-600/20">
+                  Start free trial — no credit card
+                </span>
+              </Link>
+              
+              <Link href="/demo" className="relative block bg-white/5 backdrop-blur-sm border border-white/10 text-white font-medium px-8 py-4 rounded-xl hover:bg-white/10 transition-all">
+                Schedule a demo
               </Link>
             </div>
-            <p className="text-white/40 text-xs mt-5">No credit card required · Cancel anytime</p>
+            
+            <p className="text-sm text-white/30 mt-6 relative">
+              <Globe className="inline-block h-3.5 w-3.5 mr-1.5" />
+              Trusted by developers at 500+ companies worldwide
+            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Footer */}
-        <footer className="border-t border-border py-12 bg-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-              <div className="col-span-2 md:col-span-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-                    <Code2 className="h-3.5 w-3.5 text-primary-foreground" />
-                  </div>
-                  <span className="font-bold text-sm text-foreground">Codebase Onboarding</span>
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/[0.06] bg-[#0A0A0B]">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-8 py-16">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
+            <div className="col-span-2">
+              <Link href="/" className="flex items-center gap-3 mb-4">
+                <div className="h-9 w-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                  <Terminal className="h-5 w-5 text-white" />
                 </div>
-                <p className="text-xs text-foreground-muted leading-relaxed">
-                  AI-powered engineering onboarding for modern teams.
-                </p>
+                <span className="font-bold text-white text-lg">OnboardAI</span>
+              </Link>
+              <p className="text-sm text-white/40 mb-6 max-w-xs">
+                AI-powered developer onboarding that helps new engineers ship their first PR in days, not months.
+              </p>
+              <div className="flex items-center gap-3">
+                {['GitHub', 'Twitter', 'LinkedIn', 'Discord'].map((social) => (
+                  <Link key={social} href="#" className="h-9 w-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all">
+                    <span className="text-xs font-medium">{social[0]}</span>
+                  </Link>
+                ))}
               </div>
-              {[
-                { heading: 'Product', links: ['Features', 'Pricing', 'Changelog', 'Roadmap'] },
-                { heading: 'Company', links: ['About', 'Blog', 'Careers', 'Contact'] },
-                { heading: 'Legal', links: ['Privacy', 'Terms', 'Security', 'DPA'] },
-              ].map(({ heading, links }) => (
-                <div key={heading}>
-                  <h4 className="font-semibold text-xs text-foreground mb-3">{heading}</h4>
-                  <ul className="space-y-2">
-                    {links.map((l) => (
-                      <li key={l}>
-                        <a href="#" className="text-xs text-foreground-muted hover:text-foreground transition-colors">{l}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
             </div>
-            <div className="pt-6 border-t border-border text-center text-xs text-foreground-subtle">
-              © 2026 Codebase Onboarding. All rights reserved.
+            
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-4">Product</h4>
+              <ul className="space-y-3">
+                {['Features', 'Pricing', 'Demo', 'Changelog', 'Roadmap'].map((item) => (
+                  <li key={item}>
+                    <Link href="#" className="text-sm text-white/40 hover:text-white transition-colors">{item}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-4">Company</h4>
+              <ul className="space-y-3">
+                {['About', 'Blog', 'Careers', 'Contact', 'Partners'].map((item) => (
+                  <li key={item}>
+                    <Link href="#" className="text-sm text-white/40 hover:text-white transition-colors">{item}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-4">Resources</h4>
+              <ul className="space-y-3">
+                {['Documentation', 'API Reference', 'Guides', 'Community', 'Status'].map((item) => (
+                  <li key={item}>
+                    <Link href="#" className="text-sm text-white/40 hover:text-white transition-colors">{item}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-semibold text-white mb-4">Legal</h4>
+              <ul className="space-y-3">
+                {['Privacy', 'Terms', 'Security', 'Cookies', 'DPA'].map((item) => (
+                  <li key={item}>
+                    <Link href="#" className="text-sm text-white/40 hover:text-white transition-colors">{item}</Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </footer>
-      </main>
+          
+          <div className="pt-8 border-t border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-white/30">
+              &copy; 2026 OnboardAI, Inc. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <Lock className="h-3.5 w-3.5 text-emerald-400/50" />
+                <span className="text-xs text-white/30">SOC 2 Type II Certified</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe className="h-3.5 w-3.5 text-white/30" />
+                <span className="text-xs text-white/30">GDPR Compliant</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
-  );
+  )
 }

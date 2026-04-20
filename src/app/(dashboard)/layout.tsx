@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -21,7 +21,6 @@ import { toast } from "sonner"
 import { cn, getInitials } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { useEffect } from "react"
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -47,10 +46,10 @@ function NavItem({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
         active
-          ? "border-l-2 border-sidebar-accent bg-white/10 text-white"
-          : "border-l-2 border-transparent text-sidebar-foreground hover:bg-white/5 hover:text-white"
+          ? "border-l-2 border-primary bg-primary-subtle text-primary"
+          : "border-l-2 border-transparent text-sidebar-foreground hover:bg-sidebar-border/40 hover:text-foreground"
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
@@ -87,27 +86,40 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
   return (
     <div
       className={cn(
-        "flex h-full flex-col bg-sidebar transition-all duration-200",
+        "flex h-full flex-col bg-sidebar border-r border-sidebar-border transition-all duration-200",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Header */}
       <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-sidebar-accent">
-              <span className="text-xs font-bold text-white">C</span>
+          <div className="flex items-center gap-2.5">
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-lg"
+              style={{ background: "oklch(0.546 0.243 264.4)" }}
+            >
+              <GitBranch className="h-3.5 w-3.5 text-white" />
             </div>
-            <span className="text-sm font-semibold text-white">Codebase Onboarding</span>
+            <span className="text-sm font-semibold text-foreground">Codebase</span>
           </div>
         )}
-        <button
-          onClick={onToggle}
-          className="ml-auto flex h-7 w-7 items-center justify-center rounded-md text-sidebar-foreground hover:bg-white/10 hover:text-white"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </button>
+        {collapsed && (
+          <div
+            className="mx-auto flex h-7 w-7 items-center justify-center rounded-lg"
+            style={{ background: "oklch(0.546 0.243 264.4)" }}
+          >
+            <GitBranch className="h-3.5 w-3.5 text-white" />
+          </div>
+        )}
+        {!collapsed && (
+          <button
+            onClick={onToggle}
+            className="flex h-6 w-6 items-center justify-center rounded-md text-foreground-muted hover:bg-sidebar-border/40 hover:text-foreground"
+            aria-label="Collapse sidebar"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Nav */}
@@ -122,20 +134,35 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
         ))}
       </nav>
 
+      {collapsed && (
+        <div className="flex justify-center py-2 border-t border-sidebar-border">
+          <button
+            onClick={onToggle}
+            className="flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted hover:bg-sidebar-border/40 hover:text-foreground"
+            aria-label="Expand sidebar"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* User */}
       <div className="border-t border-sidebar-border p-3">
         {!collapsed ? (
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-bold text-white">
+            <div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+              style={{ background: "oklch(0.546 0.243 264.4)" }}
+            >
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium text-white">{user?.name ?? "Loading..."}</p>
+              <p className="truncate text-xs font-semibold text-foreground">{user?.name ?? "Loading..."}</p>
               <p className="truncate text-xs text-sidebar-foreground">{user?.email ?? ""}</p>
             </div>
             <button
               onClick={handleSignOut}
-              className="text-sidebar-foreground hover:text-white"
+              className="shrink-0 text-foreground-muted hover:text-foreground"
               aria-label="Sign out"
             >
               <LogOut className="h-4 w-4" />
@@ -143,13 +170,14 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
           </div>
         ) : (
           <div className="flex justify-center">
-            <button
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white cursor-pointer"
+              style={{ background: "oklch(0.546 0.243 264.4)" }}
               onClick={handleSignOut}
-              className="text-sidebar-foreground hover:text-white"
-              aria-label="Sign out"
+              title="Sign out"
             >
-              <LogOut className="h-4 w-4" />
-            </button>
+              {initials}
+            </div>
           </div>
         )}
       </div>
@@ -157,7 +185,7 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
   )
 }
 
-function TopBar({ title }: { title?: string }) {
+function TopBar() {
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
 
@@ -166,11 +194,11 @@ function TopBar({ title }: { title?: string }) {
   )
 
   return (
-    <div className="flex h-14 items-center justify-between border-b border-border bg-background px-6">
-      <div className="flex items-center gap-2 text-sm text-foreground-muted">
-        <span className="text-foreground font-medium">{currentPage?.label ?? title ?? "Dashboard"}</span>
-      </div>
-      <div className="flex items-center gap-2">
+    <div className="flex flex-1 items-center justify-between">
+      <span className="text-sm font-semibold text-foreground">
+        {currentPage?.label ?? "Dashboard"}
+      </span>
+      <div className="flex items-center gap-1">
         <Button variant="ghost" size="icon" aria-label="Notifications">
           <Bell className="h-4 w-4" />
         </Button>

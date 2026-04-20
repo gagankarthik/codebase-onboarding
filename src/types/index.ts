@@ -16,6 +16,8 @@ export interface Repo {
   stars?: number
   lastIngestedAt?: string
   webhookId?: number
+  branch?: string
+  subfolder?: string
   createdAt: string
 }
 
@@ -37,6 +39,9 @@ export interface GuideModule {
   path: string
   purpose: string
   relevantForRole: boolean
+  topContributor?: string
+  lastUpdated?: string
+  whyItMatters?: string
 }
 
 export interface StarterTask {
@@ -45,6 +50,12 @@ export interface StarterTask {
   difficulty: "easy" | "medium" | "hard"
   why: string
   url: string
+}
+
+export interface ConventionInsight {
+  rule: string
+  confidence: string
+  category: "naming" | "error-handling" | "testing" | "patterns" | "architecture" | "tooling"
 }
 
 export interface Guide {
@@ -56,6 +67,7 @@ export interface Guide {
   setupSteps: string[]
   starterTasks: StarterTask[]
   firstWeekFocus: string
+  tribalKnowledge: ConventionInsight[]
   generatedAt: string
   version: number
 }
@@ -65,6 +77,7 @@ export interface ChatMessage {
   onboardingId: string
   role: "user" | "assistant"
   content: string
+  citations?: string[]
   createdAt: string
 }
 
@@ -88,4 +101,11 @@ export interface GitHubIssue {
   body?: string
   labels: { name: string }[]
   html_url: string
+}
+
+export interface OnboardingProgress {
+  repoConnected: boolean
+  guideGenerated: boolean
+  firstBranchCreated: boolean
+  firstPrOpened: boolean
 }

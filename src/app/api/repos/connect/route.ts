@@ -9,6 +9,8 @@ import { z } from "zod"
 
 const ConnectSchema = z.object({
   fullName: z.string().min(1),
+  branch: z.string().optional(),
+  subfolder: z.string().optional(),
 })
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -22,7 +24,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const parsed = ConnectSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 })
 
-  const { fullName } = parsed.data
+  const { fullName, branch, subfolder } = parsed.data
   const accessToken = session.githubToken
 
   try {
@@ -47,6 +49,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       description: ghRepo.description ?? undefined,
       language: ghRepo.language ?? undefined,
       stars: ghRepo.stargazers_count,
+      branch: branch ?? ghRepo.default_branch,
+      subfolder: subfolder,
     })
 
     ingestRepo(accessToken, ghRepo.full_name)

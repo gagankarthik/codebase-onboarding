@@ -6,7 +6,8 @@
       "Bash(npx shadcn@latest add card badge input label textarea select)",
       "Bash(npx shadcn@latest add dialog drawer sheet popover dropdown-menu sonner avatar separator skeleton progress tabs accordion collapsible table command tooltip form alert alert-dialog)",
       "Bash(npm run *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(item['text']\\) for item in data if item['type']=='text']\")"
     ]
   }
 }
