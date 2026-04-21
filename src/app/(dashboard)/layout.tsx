@@ -8,6 +8,7 @@ import {
   GitBranch,
   Users,
   Settings,
+  Shield,
   ChevronLeft,
   ChevronRight,
   Moon,
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/repos", label: "Repositories", icon: GitBranch },
   { href: "/onboarding", label: "Onboardings", icon: Users },
+  { href: "/security", label: "Security", icon: Shield },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 

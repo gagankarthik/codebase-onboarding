@@ -14,33 +14,6 @@ const TRUST_ITEMS = [
   { icon: Zap, label: "Setup in 2 minutes", color: "amber" },
 ]
 
-const FEATURE_PREVIEWS = [
-  { 
-    icon: Sparkles, 
-    text: "AI-generated codebase knowledge graph",
-    color: "amber"
-  },
-  { 
-    icon: MessageSquare, 
-    text: "Natural language Q&A about your repos",
-    color: "orange"
-  },
-  { 
-    icon: Target, 
-    text: "Personalised first-issue recommendations",
-    color: "rose"
-  },
-  { 
-    icon: ClipboardList, 
-    text: "Dynamic onboarding checklists per role",
-    color: "emerald"
-  },
-  { 
-    icon: Clock, 
-    text: "First PR guidance in days, not weeks",
-    color: "blue"
-  },
-]
 
 export default function SignInPage() {
   return (
@@ -120,27 +93,6 @@ export default function SignInPage() {
                 What you get access to
               </span>
             </div>
-          </div>
-
-          {/* Feature preview list */}
-          <div className="space-y-1.5">
-            {FEATURE_PREVIEWS.map(({ icon: Icon, text, color }) => (
-              <div
-                key={text}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm group hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-transparent transition-all duration-200"
-              >
-                <div className={`h-7 w-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  color === 'amber' ? 'bg-amber-50 text-amber-600' :
-                  color === 'orange' ? 'bg-orange-50 text-orange-600' :
-                  color === 'rose' ? 'bg-rose-50 text-rose-600' :
-                  color === 'emerald' ? 'bg-emerald-50 text-emerald-600' :
-                  'bg-blue-50 text-blue-600'
-                }`}>
-                  <Icon className="h-3.5 w-3.5" />
-                </div>
-                <span className="text-stone-600">{text}</span>
-              </div>
-            ))}
           </div>
 
           {/* Auto-signup note */}

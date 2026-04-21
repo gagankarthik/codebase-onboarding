@@ -72,6 +72,31 @@ export interface Guide {
   version: number
 }
 
+export interface SecurityFinding {
+  file: string
+  line: number
+  issue: string
+  severity: "critical" | "high" | "medium" | "low"
+  category: "secret" | "code-pattern" | "dependency" | "env"
+}
+
+export interface DependencyVulnerabilities {
+  critical: number
+  high: number
+  moderate: number
+  low: number
+  total: number
+}
+
+export interface SecurityScan {
+  scanId: string
+  repoId: string
+  score: number
+  findings: SecurityFinding[]
+  dependencyVulnerabilities: DependencyVulnerabilities
+  scannedAt: string
+}
+
 export interface ChatMessage {
   messageId: string
   onboardingId: string

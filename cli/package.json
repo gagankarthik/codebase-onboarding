@@ -1,0 +1,47 @@
+{
+  "name": "onboardai",
+  "version": "1.0.0",
+  "description": "CLI for OnboardAI — accelerate developer onboarding",
+  "main": "dist/index.js",
+  "bin": {
+    "onboardai": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "onboarding",
+    "developer",
+    "cli",
+    "ai",
+    "github"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "chalk": "^4.1.2",
+    "commander": "^12.1.0",
+    "execa": "^5.1.1",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1",
+    "semver": "^7.6.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^8.2.10",
+    "@types/node": "^20.0.0",
+    "@types/semver": "^7.5.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  }
+}
