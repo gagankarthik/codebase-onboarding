@@ -1,0 +1,44 @@
+graph TD
+    A[User] -->|Clicks Continue with GitHub| B(GitHub OAuth Login)
+    B -->|Authenticates| C{Select Repository}
+    C -->|Connects Repo| D[System Clones/Fetches Repo Data]
+
+    D --> E{Choose Action}
+
+    E -->|Analyze Codebase| F[Code Analysis Engine]
+    F --> F1[Structure Overview]
+    F --> F2[Tech Stack Detection]
+    F --> F3[Complexity Metrics]
+    
+    E -->|Chat with Codebase| G[LLM Chat Interface]
+    G --> G1[Ask Questions about Code]
+    G --> G2[Get Explanations / Suggestions]
+
+    E -->|Analytics| H[Repo Analytics Dashboard]
+    H --> H1[Commit Activity]
+    H --> H2[Contributor Stats]
+    H --> H3[File Change Frequency]
+
+    E -->|Security Scan| I[Security Checker]
+    I --> I1[Vulnerability Scan]
+    I --> I2[Secrets/Keys Detection]
+    I --> I3[Dependency Audit]
+
+    E -->|Error Logging| J[Error Logging System]
+    J --> J1[Runtime Error Aggregation]
+    J --> J2[Log Visualization]
+    J --> J3[Alert Rules]
+
+    F --> K{Check NPM Package}
+    G --> K
+    H --> K
+    I --> K
+    J --> K
+
+    K -->|If not installed| L[Prompt: Install via NPM?]
+    L -->|User confirms| M[Run NPM Install]
+    M --> N[Ensure Required Tools Available]
+    
+    K -->|Already installed| N
+    N --> O[All Features Ready]
+    O --> P[User Continues Workflow]

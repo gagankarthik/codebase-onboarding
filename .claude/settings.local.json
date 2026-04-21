@@ -10,7 +10,13 @@
       "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(item['text']\\) for item in data if item['type']=='text']\")",
       "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")",
       "Bash(npx next *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(xargs ls *)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\gagan\\\\Desktop\\\\Projects\\\\codebase-onboarding\\\\src\\\\app\\\\api\\\\repos\\\\[repoId]\\\\analysis\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\gagan\\\\Desktop\\\\Projects\\\\codebase-onboarding\\\\src\\\\app\\\\api\\\\repos\\\\[repoId]\\\\github-analytics\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\gagan\\\\Desktop\\\\Projects\\\\codebase-onboarding\\\\src\\\\app\\\\api\\\\alert-rules\\\\[ruleId]\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\gagan\\\\Desktop\\\\Projects\\\\codebase-onboarding\\\\src\\\\app\\\\\\(dashboard\\)\\\\repos\\\\[repoId]\\\\analysis\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\gagan\\\\Desktop\\\\Projects\\\\codebase-onboarding\\\\src\\\\app\\\\\\(dashboard\\)\\\\repos\\\\[repoId]\\\\github-analytics\")"
     ]
   }
 }

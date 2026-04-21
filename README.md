@@ -1,30 +1,31 @@
-# 🚀 Codebase Onboarding Accelerator
+# OnboardAI — Codebase Onboarding Accelerator
 
-> AI-powered onboarding that reads your GitHub repo and generates a personalised, interactive guide so new engineers ship their first PR in days — not months.
+> Connect a GitHub repo. Fill in a short form. Get a personalised, AI-generated onboarding guide so new engineers ship their first PR in days — not months.
 
-Built with **Next.js · AWS Cognito · DynamoDB · GPT-4o mini · AWS Amplify**
+**Stack:** Next.js 14 (App Router) · GitHub OAuth · AWS DynamoDB · GPT-4o mini · Tailwind CSS · TypeScript
 
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [The Problem](#the-problem)
-- [Key Features](#key-features)
+- [User Flow](#user-flow)
+- [Features](#features)
+  - [Onboarding Guides](#onboarding-guides)
+  - [Codebase Analysis](#codebase-analysis)
+  - [Chat with Your Codebase](#chat-with-your-codebase)
+  - [Repo Analytics](#repo-analytics)
+  - [Security Scanning](#security-scanning)
+  - [Error Logging & Alert Rules](#error-logging--alert-rules)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
-- [AWS Setup](#aws-setup)
-  - [DynamoDB](#dynamodb)
-  - [Amplify Deployment](#amplify-deployment)
-- [GitHub Integration](#github-integration)
-- [GPT-4o mini Integration](#gpt-4o-mini-integration)
-- [DynamoDB Schema](#dynamodb-schema)
-- [API Routes](#api-routes)
+- [DynamoDB Tables](#dynamodb-tables)
+- [API Reference](#api-reference)
 - [Authentication Flow](#authentication-flow)
-- [CLI](#cli)
+- [CLI (`onboardai`)](#cli-onboardai)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -33,33 +34,111 @@ Built with **Next.js · AWS Cognito · DynamoDB · GPT-4o mini · AWS Amplify**
 
 ## Overview
 
-The **Codebase Onboarding Accelerator** connects to a team's GitHub repository, uses AI to analyse the codebase, and auto-generates a personalised onboarding guide for each new hire. No manual documentation. No stale wikis. Just plug in the repo, fill in a short intake form for the new hire's role, and get a fully structured, interactive Day 1 experience in minutes.
+OnboardAI connects to a team's GitHub repository, uses GPT-4o mini to analyse the codebase, and generates a personalised onboarding guide for each new hire in minutes. No manual documentation. No stale wikis.
 
-Engineering managers get time back. New hires get productive in days. Senior developers stop being interrupted.
+Beyond onboarding, the platform is a full developer-intelligence layer on top of your repos: codebase structure analysis, commit & contributor analytics, security scanning for secrets and vulnerabilities, and real-time runtime error logging with configurable alert rules.
 
 ---
 
-## The Problem
+## User Flow
 
-| Without this tool | With this tool |
+```
+GitHub OAuth Login
+       │
+       ▼
+Select Repository ──► System Fetches Repo Data
+       │
+       ▼
+   Choose Action
+  ┌────┬────┬────┬────┬────┐
+  │    │    │    │    │    │
+  ▼    ▼    ▼    ▼    ▼    ▼
+Analyze  Chat  Repo  Security  Error
+Code     AI   Analytics  Scan  Logging
+  │            │                │
+Structure   Commits        Alert Rules
+Tech Stack  Contributors   Log Viewer
+Complexity  Hot Files      Runtime Errors
+```
+
+Every feature path checks whether the `onboardai` CLI npm package is installed and prompts the user to install it if missing, enabling local CLI sync and security scanning.
+
+---
+
+## Features
+
+### Onboarding Guides
+
+Fill a short intake form (new hire name, role, team, first sprint focus). The AI reads your repo and generates:
+
+- **Architecture overview** — plain-English description of the codebase
+- **Key modules** — annotated file map with role-relevance badges
+- **Coding conventions** — detected rules from real code (not from a wiki)
+- **Setup steps** — reproduction of steps to run the project locally
+- **Starter tasks** — 3 good-first-issues ranked by difficulty
+- **First week focus** — personalised focus area based on role and sprint
+- **Tribal knowledge** — unwritten conventions inferred from patterns
+
+Guides auto-refresh on every push to `main` via GitHub webhook.
+
+### Codebase Analysis
+
+Navigate to **Repos → [repo] → Analyze Codebase**.
+
+| Section | What it shows |
 |---|---|
-| New hire takes 4–6 weeks to first meaningful PR | First meaningful PR in 3–5 days |
-| Senior devs lose 15–20 hrs answering basic questions | Zero interruptions — new hire asks the AI |
-| Confluence docs are 18 months out of date | Guide auto-updates on every GitHub push |
-| Onboarding is the same for every role | Personalised per role, team, and first sprint |
-| Replacing a developer costs $77K+ | Retain talent with a great Day 1 experience |
+| Complexity metrics | Total files, total lines, avg file size, test file count, dependency count |
+| Tech stack | Languages, frameworks, tools, databases — detected from extensions and `package.json` |
+| Directory breakdown | File count per top-level directory, rendered as a bar chart |
+| Largest files | Top 5 files by line count |
+| Entry points | Detected `index.*`, `main.*`, `app.*`, `server.*` files |
 
----
+### Chat with Your Codebase
 
-## Key Features
+Navigate to **Onboarding → [onboarding] → Chat**.
 
-- **Zero-writing onboarding** — connects to GitHub, generates the entire guide automatically
-- **Role-based personalisation** — engineering manager fills a short intake form, AI tailors the output
-- **Chat with your codebase** — new hire asks "how does auth work?" and gets answers grounded in real code (RAG)
-- **Starter task suggestions** — AI surfaces 3 good first issues from open GitHub Issues ranked by difficulty
-- **Auto-updates** — guide regenerates on every push to main, so it never goes stale
-- **Progress tracking** — track time-to-first-PR per hire and onboarding completion rates
-- **Slack notifications** — new hire is notified when their guide is ready; manager is alerted on first PR
+- Ask "How does auth work?", "What's the database schema?", "How do I run tests?"
+- Responses are grounded in actual file contents (RAG over repo snapshot)
+- Code blocks rendered with syntax highlighting and a copy button
+- Full conversation history persisted in DynamoDB
+
+### Repo Analytics
+
+Navigate to **Repos → [repo] → Repo Analytics**.
+
+Powered by the GitHub Stats API:
+
+| Metric | Detail |
+|---|---|
+| Commit activity | Weekly bar chart for the last 26 weeks |
+| Top contributors | Ranked by commits, with additions/deletions and weeks active |
+| Most changed files | Files most frequently touched in the last 30 commits |
+
+### Security Scanning
+
+Navigate to **Security** or run `onboardai security` in your project.
+
+- **Secret detection** — AWS keys, GitHub tokens, OpenAI keys, Stripe keys, private keys, hardcoded passwords, JWT secrets, database URLs
+- **Unsafe code patterns** — `eval()`, `innerHTML`, SQL concatenation, `Math.random` for tokens, command injection, `__proto__`, unsafe deserialization
+- **Dependency audit** — npm vulnerability count (critical / high / medium / low)
+- **Score** — 0–100 security score with per-finding severity breakdown
+
+### Error Logging & Alert Rules
+
+Navigate to **Events** and embed the browser SDK in your app.
+
+**Event types tracked:** `error`, `api_error`, `warning`, `page_view`, `performance`, `info`
+
+**Alert Rules** — create rules that fire when thresholds are crossed:
+
+| Condition | When it fires |
+|---|---|
+| `error_count` | Error count exceeds N in a rolling window |
+| `critical_error` | Any critical error occurs |
+| `high_error_rate` | Error rate exceeds threshold |
+| `new_error_type` | A previously unseen error type is detected |
+
+Actions: `log` (always), `email` (to a specified address), `webhook` (POST to a URL).
 
 ---
 
@@ -67,14 +146,14 @@ Engineering managers get time back. New hires get productive in days. Senior dev
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Frontend | Next.js 14 (App Router) | UI, server components, API routes |
-| Auth | AWS Cognito + Amplify Auth | User sign-up, sign-in, JWT tokens |
-| Database | AWS DynamoDB | Repos, onboardings, guides, users |
-| AI | OpenAI GPT-4o mini | Guide generation, chat (RAG) |
-| File ingestion | GitHub REST API v3 | Repo tree, file contents, PRs, issues |
-| Hosting | AWS Amplify | CI/CD, hosting, env management |
-| Styling | Tailwind CSS | Utility-first styling |
-| Storage | AWS S3 (via Amplify Storage) | Generated guide cache, embeddings |
+| Frontend | Next.js 14 (App Router) | UI, streaming API routes, SSR |
+| Auth | GitHub OAuth + custom JWT session | Sign-in, per-request auth |
+| Database | AWS DynamoDB | All data persistence — 11 tables |
+| AI | OpenAI GPT-4o mini | Guide generation, chat (RAG), event analysis |
+| GitHub | Octokit REST v3 | Repo tree, file contents, stats, PRs, issues |
+| Styling | Tailwind CSS + shadcn/ui | Utility-first design system |
+| Animation | Framer Motion | Page transitions and stagger lists |
+| CLI | `onboardai` (npm) | Local security scanning, env check, dashboard sync |
 
 ---
 
@@ -562,87 +641,263 @@ export async function chatWithCodebase(
 
 ---
 
-## DynamoDB Schema
+## DynamoDB Tables
 
-### coa-prod-users
+All tables use the prefix `DYNAMODB_TABLE_PREFIX` (default `coa`). Table names follow the pattern `{prefix}-{name}`.
 
-| Attribute | Type | Description |
+> **GSI** = Global Secondary Index. Create these in the AWS Console or via IaC before running the app.
+
+### `coa-users`
+
+PK: `userId`
+
+| Attribute | Type | Notes |
 |---|---|---|
-| `userId` | String (PK) | Cognito sub (UUID) |
-| `email` | String | User email |
-| `name` | String | Full name |
+| `userId` | String | GitHub user ID |
+| `email` | String | |
+| `name` | String | |
 | `plan` | String | `starter` \| `growth` \| `scale` |
+| `apiKey` | String | `coa_…` — auto-generated on first request |
 | `createdAt` | String | ISO timestamp |
 
-### coa-prod-repos
+### `coa-repos`
 
-| Attribute | Type | Description |
+PK: `repoId` · GSI: `userId-createdAt-index`
+
+| Attribute | Type | Notes |
 |---|---|---|
-| `repoId` | String (PK) | `{ownerId}#{repoName}` |
-| `userId` | String | Owner (Cognito userId) |
+| `repoId` | String | UUID |
+| `userId` | String | |
 | `githubRepoId` | Number | GitHub internal repo ID |
 | `fullName` | String | e.g. `acme/backend-api` |
-| `accessToken` | String | GitHub OAuth token (encrypted) |
-| `fileSnapshot` | String | JSON stringified file tree + contents |
+| `fileSnapshot` | String | JSON — repo tree + file contents |
 | `lastIngestedAt` | String | ISO timestamp |
-| `webhookId` | Number | GitHub webhook ID for this repo |
+| `webhookId` | Number | GitHub webhook ID |
 
-### coa-prod-onboardings
+### `coa-onboardings`
 
-| Attribute | Type | Description |
+PK: `onboardingId` · GSI: `repoId-createdAt-index`
+
+| Attribute | Type | Notes |
 |---|---|---|
-| `onboardingId` | String (PK) | UUID |
-| `repoId` | String (GSI) | Foreign key → repos |
-| `newHireName` | String | Display name |
-| `newHireEmail` | String | To send guide link |
-| `role` | String | e.g. `backend engineer` |
-| `team` | String | e.g. `platform` |
-| `firstSprintFocus` | String | Free text from intake form |
-| `status` | String | `pending` \| `generating` \| `ready` |
-| `firstPrAt` | String | ISO — set when first PR merged |
-| `createdAt` | String | ISO timestamp |
+| `onboardingId` | String | UUID |
+| `repoId` | String | |
+| `newHireName` | String | |
+| `newHireEmail` | String | |
+| `role` | String | |
+| `team` | String | |
+| `firstSprintFocus` | String | |
+| `status` | String | `pending` \| `generating` \| `ready` \| `error` |
+| `firstPrAt` | String | Set when first PR opened |
+| `createdAt` | String | |
 
-### coa-prod-guides
+### `coa-guides`
 
-| Attribute | Type | Description |
+PK: `guideId` · GSI: `onboardingId-generatedAt-index`
+
+| Attribute | Type | Notes |
 |---|---|---|
-| `guideId` | String (PK) | UUID |
-| `onboardingId` | String (GSI) | Foreign key → onboardings |
-| `architectureOverview` | String | AI-generated overview |
-| `keyModules` | List | Array of module objects |
-| `codingConventions` | List | Array of strings |
-| `setupSteps` | List | Array of strings |
-| `starterTasks` | List | Array of task objects |
-| `firstWeekFocus` | String | Personalised focus summary |
-| `generatedAt` | String | ISO timestamp |
-| `version` | Number | Increments on each refresh |
+| `guideId` | String | UUID |
+| `onboardingId` | String | |
+| `architectureOverview` | String | |
+| `keyModules` | List | `GuideModule[]` |
+| `codingConventions` | List | `string[]` |
+| `setupSteps` | List | `string[]` |
+| `starterTasks` | List | `StarterTask[]` |
+| `firstWeekFocus` | String | |
+| `tribalKnowledge` | List | `ConventionInsight[]` |
+| `generatedAt` | String | |
+| `version` | Number | Increments on refresh |
 
-### coa-prod-messages
+### `coa-messages`
 
-| Attribute | Type | Description |
+PK: `messageId` · GSI: `onboardingId-createdAt-index`
+
+| Attribute | Type | Notes |
 |---|---|---|
-| `messageId` | String (PK) | UUID |
-| `onboardingId` | String (GSI) | Foreign key → onboardings |
+| `messageId` | String | UUID |
+| `onboardingId` | String | |
 | `role` | String | `user` \| `assistant` |
-| `content` | String | Message text |
-| `createdAt` | String | ISO timestamp |
+| `content` | String | |
+| `citations` | List | File paths cited by AI |
+| `createdAt` | String | |
+
+### `coa-web-events`
+
+PK: `eventId` · GSI: `repoId-createdAt-index`
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `eventId` | String | UUID |
+| `repoId` | String | |
+| `type` | String | `error` \| `api_error` \| `warning` \| `page_view` \| `performance` \| `info` |
+| `message` | String | |
+| `stack` | String | Stack trace |
+| `url` | String | Page URL |
+| `analysis` | Map | AI root-cause analysis |
+| `createdAt` | String | |
+
+### `coa-alert-rules`
+
+PK: `ruleId` · GSI: `repoId-createdAt-index`
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `ruleId` | String | UUID |
+| `repoId` | String | |
+| `name` | String | |
+| `condition` | String | `error_count` \| `critical_error` \| `high_error_rate` \| `new_error_type` |
+| `threshold` | Number | Errors before rule fires |
+| `windowMinutes` | Number | Rolling window |
+| `action` | String | `log` \| `email` \| `webhook` |
+| `actionTarget` | String | Email address or webhook URL |
+| `enabled` | Boolean | |
+| `triggeredCount` | Number | Lifetime trigger count |
+| `lastTriggeredAt` | String | ISO timestamp |
+| `createdAt` | String | |
+
+### `coa-analysis`
+
+PK: `analysisId` · GSI: `repoId-analyzedAt-index`
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `analysisId` | String | UUID |
+| `repoId` | String | |
+| `directoryTree` | List | `DirectoryNode[]` |
+| `techStack` | List | `TechStackEntry[]` |
+| `complexity` | Map | `ComplexityMetrics` |
+| `entryPoints` | List | `string[]` |
+| `analyzedAt` | String | ISO timestamp |
+
+### `coa-security-scans`
+
+PK: `scanId` · GSI: `repoId-scannedAt-index`
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `scanId` | String | UUID |
+| `repoId` | String | |
+| `score` | Number | 0–100 |
+| `findings` | List | `SecurityFinding[]` |
+| `dependencyVulnerabilities` | Map | counts by severity |
+| `scannedAt` | String | |
+
+### `coa-analytics-pageviews`
+
+PK: `pvId` · GSI: `repoId-timestamp-index`
+
+Tracks web analytics page views collected via `POST /api/analytics/collect`.
+
+### `coa-analytics-sessions`
+
+PK: `sessionId` · GSI: `repoId-lastSeenAt-index`
+
+Tracks unique visitor sessions.
+
+### `coa-api-logs`
+
+PK: `logId` · GSI: `userId-timestamp-index`
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `logId` | String | UUID |
+| `userId` | String | |
+| `method` | String | HTTP method |
+| `path` | String | API route path |
+| `userAgent` | String | |
+| `timestamp` | String | ISO timestamp |
+
+Populated automatically by the middleware for every authenticated API call. View via `GET /api/logs`.
 
 ---
 
-## API Routes
+## API Reference
+
+All protected routes require a valid session cookie (`coa_session`). The middleware injects `x-user-id` into the request headers.
+
+### Auth
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
-| `GET` | `/api/repos` | ✅ Required | List connected repos for current user |
-| `POST` | `/api/repos/connect` | ✅ Required | Handle GitHub OAuth callback |
-| `POST` | `/api/repos/ingest` | ✅ Required | Ingest repo file tree into DynamoDB |
-| `POST` | `/api/onboarding/create` | ✅ Required | Create new onboarding + trigger guide gen |
-| `GET` | `/api/onboarding/[id]` | ✅ Required | Get onboarding + guide data |
-| `PUT` | `/api/onboarding/[id]` | ✅ Required | Update onboarding status |
-| `POST` | `/api/guide/generate` | ✅ Required | Trigger / re-trigger guide generation |
-| `POST` | `/api/guide/refresh` | ✅ Required | Refresh guide from latest repo snapshot |
-| `POST` | `/api/chat` | ✅ Required | Send chat message, receive streaming response |
-| `POST` | `/api/webhooks/github` | 🔐 Webhook secret | GitHub push webhook → refresh guide |
+| `GET` | `/api/auth/github` | Public | Redirect to GitHub OAuth |
+| `GET` | `/api/auth/callback` | Public | Handle GitHub OAuth callback, set session |
+| `GET` | `/api/auth/me` | Cookie | Return current user info |
+| `POST` | `/api/auth/signout` | Cookie | Clear session cookie |
+
+### Repositories
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/repos` | ✅ | List repos for current user |
+| `POST` | `/api/repos/connect` | ✅ | Connect a GitHub repo |
+| `POST` | `/api/repos/ingest` | ✅ | Re-ingest file snapshot |
+| `GET` | `/api/repos/[id]/branches` | ✅ | List branches via GitHub API |
+| `GET` | `/api/repos/[id]/pulls` | ✅ | List PRs via GitHub API |
+| `GET` | `/api/repos/[id]/analysis` | ✅ | Get latest codebase analysis |
+| `POST` | `/api/repos/[id]/analysis` | ✅ | Run new codebase analysis |
+| `GET` | `/api/repos/[id]/github-analytics` | ✅ | Get commit activity, contributors, hot files |
+
+### Onboarding & Guides
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/onboarding/create` | ✅ | Create onboarding + trigger guide generation |
+| `GET` | `/api/onboarding/[id]` | ✅ | Get onboarding + guide |
+| `PUT` | `/api/onboarding/[id]` | ✅ | Update status or first PR timestamp |
+| `POST` | `/api/guide/generate` | ✅ | Trigger guide generation |
+| `POST` | `/api/guide/refresh` | ✅ | Re-ingest + regenerate guide |
+
+### Chat
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/chat` | ✅ | Send message, stream AI response (SSE) |
+| `GET` | `/api/chat/history` | ✅ | Get conversation history |
+
+### Security
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/security` | ✅ | Run security scan on connected repo |
+| `GET` | `/api/security` | ✅ | Get latest scan result |
+
+### Events & Alert Rules
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/events` | ✅ | List events (with stats) |
+| `POST` | `/api/events/ingest` | API key | Ingest browser/app events |
+| `POST` | `/api/events/analyze` | ✅ | Run AI analysis on an event |
+| `GET` | `/api/alert-rules?repoId=` | ✅ | List alert rules for a repo |
+| `POST` | `/api/alert-rules` | ✅ | Create alert rule |
+| `PATCH` | `/api/alert-rules/[id]` | ✅ | Update rule (enable/disable, threshold) |
+| `DELETE` | `/api/alert-rules/[id]` | ✅ | Delete rule |
+
+### Analytics
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/analytics` | ✅ | Web analytics summary |
+| `POST` | `/api/analytics/collect` | Public | Collect page view |
+| `GET` | `/api/analytics/realtime` | ✅ | SSE stream for live visitor count |
+
+### Settings & Logs
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/settings/account` | ✅ | Get account info |
+| `PUT` | `/api/settings/account` | ✅ | Update name |
+| `GET` | `/api/settings/api-key` | ✅ | Get API key (creates if none) |
+| `POST` | `/api/settings/api-key/regenerate` | ✅ | Regenerate API key |
+| `GET` | `/api/logs` | ✅ | Get API usage logs |
+
+### CLI & Webhooks
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/cli/sync` | API key | Receive CLI sync payload |
+| `POST` | `/api/webhooks/github` | Webhook secret | GitHub push → refresh guide |
 
 ---
 

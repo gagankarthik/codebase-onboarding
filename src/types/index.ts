@@ -207,3 +207,104 @@ export interface OnboardingProgress {
   firstBranchCreated: boolean
   firstPrOpened: boolean
 }
+
+// ── Codebase Analysis ─────────────────────────────────────────────────────────
+
+export interface DirectoryNode {
+  name: string
+  path: string
+  fileCount: number
+  totalLines: number
+}
+
+export interface TechStackEntry {
+  name: string
+  version?: string
+  category: "language" | "framework" | "tool" | "database" | "cloud" | "testing"
+  confidence: "detected" | "inferred"
+}
+
+export interface ComplexityMetrics {
+  totalFiles: number
+  totalLines: number
+  avgFileSizeLines: number
+  largestFiles: { path: string; lines: number }[]
+  dependencyCount: number
+  testFileCount: number
+  configFileCount: number
+}
+
+export interface CodebaseAnalysis {
+  analysisId: string
+  repoId: string
+  directoryTree: DirectoryNode[]
+  techStack: TechStackEntry[]
+  complexity: ComplexityMetrics
+  entryPoints: string[]
+  analyzedAt: string
+}
+
+// ── GitHub Repo Analytics ─────────────────────────────────────────────────────
+
+export interface WeeklyCommit {
+  week: number     // Unix timestamp of week start
+  total: number
+  additions: number
+  deletions: number
+}
+
+export interface ContributorStat {
+  login: string
+  avatar: string
+  totalCommits: number
+  additions: number
+  deletions: number
+  weeksActive: number
+}
+
+export interface FileChangeFrequency {
+  path: string
+  changeCount: number
+  lastChanged: string
+}
+
+export interface RepoGitHubAnalytics {
+  fullName: string
+  weeklyCommits: WeeklyCommit[]
+  contributors: ContributorStat[]
+  mostChangedFiles: FileChangeFrequency[]
+  fetchedAt: string
+}
+
+// ── Alert Rules ───────────────────────────────────────────────────────────────
+
+export type AlertCondition = "error_count" | "critical_error" | "high_error_rate" | "new_error_type"
+export type AlertAction = "log" | "email" | "webhook"
+
+export interface AlertRule {
+  ruleId: string
+  repoId: string
+  name: string
+  condition: AlertCondition
+  threshold?: number            // e.g. 5 errors per window
+  windowMinutes?: number        // rolling window
+  action: AlertAction
+  actionTarget?: string         // email address or webhook URL
+  enabled: boolean
+  triggeredCount: number
+  lastTriggeredAt?: string
+  createdAt: string
+}
+
+// ── API Logs ──────────────────────────────────────────────────────────────────
+
+export interface ApiLog {
+  logId: string
+  userId?: string
+  method: string
+  path: string
+  statusCode?: number
+  durationMs?: number
+  userAgent?: string
+  timestamp: string
+}

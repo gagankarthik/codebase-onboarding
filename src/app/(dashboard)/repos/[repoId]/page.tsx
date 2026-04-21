@@ -15,7 +15,14 @@ import {
   Circle,
   CheckCircle2,
   XCircle,
+  FolderTree,
+  BarChart2,
+  MessageSquare,
+  Shield,
+  Activity,
+  ArrowRight,
 } from "lucide-react"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -494,6 +501,63 @@ export default function RepoDetailPage() {
             View on GitHub <ExternalLink className="h-3 w-3" />
           </a>
         </Button>
+      </div>
+
+      {/* Choose Action */}
+      <div>
+        <h2 className="mb-3 text-sm font-semibold text-foreground">Choose an action</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            {
+              icon: FolderTree,
+              label: "Analyze Codebase",
+              description: "Structure, tech stack, complexity",
+              href: `/repos/${repoId}/analysis`,
+              color: "text-primary bg-primary-subtle border-primary/20 hover:bg-primary-muted",
+            },
+            {
+              icon: MessageSquare,
+              label: "Chat with Code",
+              description: "Ask questions, get explanations",
+              href: `/onboarding`,
+              color: "text-success bg-success-subtle border-success/20 hover:bg-success-muted",
+            },
+            {
+              icon: BarChart2,
+              label: "Repo Analytics",
+              description: "Commits, contributors, hot files",
+              href: `/repos/${repoId}/github-analytics`,
+              color: "text-amber-600 bg-amber-50 border-amber-200 hover:bg-amber-100 dark:bg-amber-950/30 dark:border-amber-900 dark:hover:bg-amber-950/50",
+            },
+            {
+              icon: Shield,
+              label: "Security Scan",
+              description: "Secrets, vulns, unsafe patterns",
+              href: `/security`,
+              color: "text-destructive bg-destructive-subtle border-destructive/20 hover:bg-red-100 dark:hover:bg-red-950/40",
+            },
+            {
+              icon: Activity,
+              label: "Error Logging",
+              description: "Runtime errors, alerts, logs",
+              href: `/events`,
+              color: "text-purple-600 bg-purple-50 border-purple-200 hover:bg-purple-100 dark:bg-purple-950/30 dark:border-purple-900 dark:hover:bg-purple-950/50",
+            },
+          ].map((action) => (
+            <Link key={action.label} href={action.href}>
+              <div
+                className={`group flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${action.color}`}
+              >
+                <action.icon className="mt-0.5 h-5 w-5 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium leading-snug">{action.label}</p>
+                  <p className="mt-0.5 text-xs opacity-70">{action.description}</p>
+                </div>
+                <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Tabs */}

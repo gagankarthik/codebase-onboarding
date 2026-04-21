@@ -17,11 +17,22 @@ const PROTECTED_PATHS = [
   "/api/events",
   "/api/analytics",
   "/api/settings",
+  "/api/alert-rules",
+  "/api/logs",
 ]
 
-// Sub-paths of protected routes that are public (use their own auth e.g. API key)
-const PUBLIC_SUBPATHS = ["/api/events/ingest", "/api/analytics/collect"]
+// Sub-paths that are public (use their own auth e.g. API key or webhook secret)
+const PUBLIC_SUBPATHS = [
+  "/api/events/ingest",
+  "/api/analytics/collect",
+  "/api/cli/sync",
+  "/api/webhooks/github",
+]
+
 const AUTH_PATHS = ["/sign-in"]
+
+// Paths logged as API usage (must be API routes that go through session auth)
+const LOGGED_PREFIXES = ["/api/repos", "/api/onboarding", "/api/guide", "/api/chat", "/api/security", "/api/alert-rules"]
 
 function getSecret(): Uint8Array {
   return new TextEncoder().encode(process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod")
@@ -34,6 +45,18 @@ async function getSession(token: string) {
   } catch {
     return null
   }
+}
+
+// Fire-and-forget API log — runs outside the critical path
+function fireApiLog(userId: string, method: string, path: string, ua: string) {
+  const body = JSON.stringify({ userId, method, path, userAgent: ua, timestamp: new Date().toISOString() })
+  // Use fetch to avoid importing DynamoDB SDK into Edge middleware
+  // The /api/logs/ingest endpoint handles the write; if it fails the request is unaffected.
+  fetch("/api/logs/ingest", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-internal": "1" },
+    body,
+  }).catch(() => {})
 }
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
@@ -58,6 +81,16 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
       url.pathname = "/sign-in"
       url.searchParams.set("redirect", pathname)
       return NextResponse.redirect(url)
+    }
+
+    // Log API usage (fire-and-forget, never blocks the response)
+    if (LOGGED_PREFIXES.some((p) => pathname.startsWith(p))) {
+      fireApiLog(
+        session.userId,
+        request.method,
+        pathname,
+        request.headers.get("user-agent") ?? ""
+      )
     }
 
     const response = NextResponse.next()

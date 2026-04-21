@@ -6,15 +6,228 @@ import {
   AlertOctagon, AlertTriangle, Info, Activity, Eye, Wifi,
   WifiOff, Sparkles, Copy, Check, ChevronDown, ChevronRight,
   RefreshCw, Globe, Zap, BarChart3, Clock, FileCode,
+  Bell, Plus, Trash2, ToggleLeft, ToggleRight,
 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { PageHeader } from "@/components/ui/page-header"
 import { EmptyState } from "@/components/ui/empty-state"
 import { staggerContainer, fadeInUp } from "@/lib/animations"
 import { formatRelativeTime } from "@/lib/utils"
-import type { Repo, WebEvent, EventAnalysis, WebEventType } from "@/types"
+import type { Repo, WebEvent, EventAnalysis, WebEventType, AlertRule } from "@/types"
+
+// ── Alert Rules panel ─────────────────────────────────────────────────────────
+
+function AlertRulesPanel({ repoId }: { repoId: string }) {
+  const [rules, setRules] = useState<AlertRule[]>([])
+  const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({
+    name: "",
+    condition: "error_count" as AlertRule["condition"],
+    threshold: "5",
+    windowMinutes: "60",
+    action: "log" as AlertRule["action"],
+    actionTarget: "",
+  })
+
+  async function loadRules() {
+    try {
+      const res = await fetch(`/api/alert-rules?repoId=${repoId}`)
+      const data = await res.json() as { rules: AlertRule[] }
+      setRules(data.rules ?? [])
+    } catch {
+      toast.error("Failed to load alert rules.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function createRule() {
+    if (!form.name.trim()) { toast.error("Rule name is required."); return }
+    setCreating(true)
+    try {
+      const res = await fetch("/api/alert-rules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          repoId,
+          name: form.name,
+          condition: form.condition,
+          threshold: Number(form.threshold) || undefined,
+          windowMinutes: Number(form.windowMinutes) || undefined,
+          action: form.action,
+          actionTarget: form.actionTarget || undefined,
+          enabled: true,
+        }),
+      })
+      if (!res.ok) throw new Error()
+      await loadRules()
+      setShowForm(false)
+      setForm({ name: "", condition: "error_count", threshold: "5", windowMinutes: "60", action: "log", actionTarget: "" })
+      toast.success("Alert rule created.")
+    } catch {
+      toast.error("Failed to create rule.")
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  async function toggleRule(ruleId: string, enabled: boolean) {
+    await fetch(`/api/alert-rules/${ruleId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled: !enabled }),
+    })
+    setRules((rs) => rs.map((r) => r.ruleId === ruleId ? { ...r, enabled: !enabled } : r))
+  }
+
+  async function deleteRule(ruleId: string) {
+    await fetch(`/api/alert-rules/${ruleId}`, { method: "DELETE" })
+    setRules((rs) => rs.filter((r) => r.ruleId !== ruleId))
+    toast.success("Alert rule deleted.")
+  }
+
+  useEffect(() => { if (repoId) loadRules() }, [repoId])
+
+  const CONDITION_LABELS: Record<AlertRule["condition"], string> = {
+    error_count: "Error count exceeds threshold",
+    critical_error: "Any critical error",
+    high_error_rate: "High error rate",
+    new_error_type: "New error type seen",
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card">
+      <div className="flex items-center justify-between border-b border-border px-5 py-4">
+        <div className="flex items-center gap-2">
+          <Bell className="h-4 w-4 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Alert Rules</span>
+          {rules.length > 0 && (
+            <span className="rounded-full bg-primary-subtle px-2 py-0.5 text-xs font-medium text-primary">
+              {rules.length}
+            </span>
+          )}
+        </div>
+        <Button size="sm" variant="outline" onClick={() => setShowForm((v) => !v)}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" />
+          Add rule
+        </Button>
+      </div>
+
+      {showForm && (
+        <div className="border-b border-border bg-background-subtle p-5 space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Rule name</Label>
+              <Input className="h-8 text-xs" placeholder="Too many errors" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Condition</Label>
+              <select
+                className="h-8 w-full rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                value={form.condition}
+                onChange={(e) => setForm((f) => ({ ...f, condition: e.target.value as AlertRule["condition"] }))}
+              >
+                {Object.entries(CONDITION_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Threshold (errors)</Label>
+              <Input className="h-8 text-xs" type="number" min="1" value={form.threshold} onChange={(e) => setForm((f) => ({ ...f, threshold: e.target.value }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Window (minutes)</Label>
+              <Input className="h-8 text-xs" type="number" min="1" value={form.windowMinutes} onChange={(e) => setForm((f) => ({ ...f, windowMinutes: e.target.value }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Action</Label>
+              <select
+                className="h-8 w-full rounded-md border border-input bg-background px-3 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                value={form.action}
+                onChange={(e) => setForm((f) => ({ ...f, action: e.target.value as AlertRule["action"] }))}
+              >
+                <option value="log">Log only</option>
+                <option value="email">Email</option>
+                <option value="webhook">Webhook</option>
+              </select>
+            </div>
+            {(form.action === "email" || form.action === "webhook") && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">{form.action === "email" ? "Email address" : "Webhook URL"}</Label>
+                <Input className="h-8 text-xs" placeholder={form.action === "email" ? "you@company.com" : "https://hooks.example.com/..."} value={form.actionTarget} onChange={(e) => setForm((f) => ({ ...f, actionTarget: e.target.value }))} />
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={createRule} disabled={creating}>
+              {creating ? "Creating…" : "Create rule"}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+          </div>
+        </div>
+      )}
+
+      <div className="divide-y divide-border">
+        {loading ? (
+          <div className="p-5 text-xs text-foreground-muted">Loading rules…</div>
+        ) : rules.length === 0 ? (
+          <div className="p-5 text-xs text-foreground-muted">
+            No alert rules yet. Add a rule to get notified when error thresholds are reached.
+          </div>
+        ) : (
+          rules.map((rule) => (
+            <div key={rule.ruleId} className="flex items-start gap-3 px-5 py-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-foreground">{rule.name}</span>
+                  <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${rule.enabled ? "bg-success-subtle text-success" : "bg-background-muted text-foreground-muted"}`}>
+                    {rule.enabled ? "Active" : "Paused"}
+                  </span>
+                </div>
+                <p className="mt-0.5 text-[11px] text-foreground-muted">
+                  {CONDITION_LABELS[rule.condition]}
+                  {rule.threshold ? ` · ≥ ${rule.threshold} in ${rule.windowMinutes}min` : ""}
+                  {" · "}{rule.action}{rule.actionTarget ? ` → ${rule.actionTarget}` : ""}
+                </p>
+                {rule.lastTriggeredAt && (
+                  <p className="mt-0.5 text-[10px] text-foreground-subtle">
+                    Last triggered {formatRelativeTime(rule.lastTriggeredAt)} · {rule.triggeredCount}×
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={() => toggleRule(rule.ruleId, rule.enabled)}
+                  className="text-foreground-muted hover:text-foreground transition-colors"
+                  title={rule.enabled ? "Pause rule" : "Activate rule"}
+                >
+                  {rule.enabled
+                    ? <ToggleRight className="h-4 w-4 text-success" />
+                    : <ToggleLeft className="h-4 w-4" />
+                  }
+                </button>
+                <button
+                  onClick={() => deleteRule(rule.ruleId)}
+                  className="text-foreground-muted hover:text-destructive transition-colors"
+                  title="Delete rule"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -618,11 +831,16 @@ export default function EventsPage() {
             </div>
           </motion.div>
 
-          {/* SDK snippet */}
+          {/* Alert rules + SDK snippet */}
           {selectedRepo && (
-            <motion.div variants={fadeInUp}>
-              <SdkSnippet repoId={selectedRepo.repoId} />
-            </motion.div>
+            <>
+              <motion.div variants={fadeInUp}>
+                <AlertRulesPanel repoId={selectedRepo.repoId} />
+              </motion.div>
+              <motion.div variants={fadeInUp}>
+                <SdkSnippet repoId={selectedRepo.repoId} />
+              </motion.div>
+            </>
           )}
         </motion.div>
       )}
