@@ -72,6 +72,34 @@ export interface Guide {
   version: number
 }
 
+export type WebEventType = "error" | "warning" | "api_error" | "page_view" | "performance" | "info"
+
+export interface EventAnalysis {
+  explanation: string
+  rootCause: string
+  affectedFile?: string
+  affectedLine?: number
+  suggestedFix: string
+  confidence: "high" | "medium" | "low"
+}
+
+export interface WebEvent {
+  eventId: string
+  repoId: string
+  type: WebEventType
+  message: string
+  stack?: string
+  url?: string
+  filename?: string
+  lineno?: number
+  colno?: number
+  userAgent?: string
+  metadata?: Record<string, string | number | boolean>
+  analysis?: EventAnalysis
+  analyzedAt?: string
+  createdAt: string
+}
+
 export interface SecurityFinding {
   file: string
   line: number

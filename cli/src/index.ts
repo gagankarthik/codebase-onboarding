@@ -7,6 +7,7 @@ import { fixCommand } from "./commands/fix"
 import { reportCommand } from "./commands/report"
 import { shareCommand } from "./commands/share"
 import { syncCommand } from "./commands/sync"
+import { monitorCommand } from "./commands/monitor"
 
 const program = new Command()
 
@@ -61,6 +62,15 @@ program
   .description("Sync local progress with the OnboardAI dashboard")
   .option("--api-key <key>", "Your OnboardAI API key")
   .action(syncCommand)
+
+program
+  .command("monitor")
+  .description("Continuously monitor web events and auto-analyze errors with AI")
+  .option("--repo <repoId>", "Repo ID to monitor (defaults to first connected repo)")
+  .option("--interval <seconds>", "Polling interval in seconds (default: 10)", "10")
+  .option("--ai", "Auto-analyze errors with AI as they arrive")
+  .option("--api-key <key>", "Your OnboardAI API key")
+  .action(monitorCommand)
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   console.error("Unexpected error:", err instanceof Error ? err.message : err)

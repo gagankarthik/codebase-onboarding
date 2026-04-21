@@ -14,7 +14,11 @@ const PROTECTED_PATHS = [
   "/api/chat",
   "/api/github",
   "/api/security",
+  "/api/events",
 ]
+
+// Sub-paths of protected routes that are public (use their own auth e.g. API key)
+const PUBLIC_SUBPATHS = ["/api/events/ingest"]
 const AUTH_PATHS = ["/sign-in"]
 
 function getSecret(): Uint8Array {
@@ -32,7 +36,8 @@ async function getSession(token: string) {
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
-  const isProtected = PROTECTED_PATHS.some((p) => pathname.startsWith(p))
+  const isPublicSubpath = PUBLIC_SUBPATHS.some((p) => pathname.startsWith(p))
+  const isProtected = !isPublicSubpath && PROTECTED_PATHS.some((p) => pathname.startsWith(p))
   const isAuthPath = AUTH_PATHS.some((p) => pathname.startsWith(p))
 
   const sessionToken = request.cookies.get(SESSION_COOKIE)?.value

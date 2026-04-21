@@ -16,6 +16,7 @@ import {
   Bell,
   LogOut,
   Menu,
+  ChartSpline,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { toast } from "sonner"
@@ -28,6 +29,8 @@ const NAV_ITEMS = [
   { href: "/repos", label: "Repositories", icon: GitBranch },
   { href: "/onboarding", label: "Onboardings", icon: Users },
   { href: "/security", label: "Security", icon: Shield },
+  { href: "/events", label: "Events", icon: Bell },
+  { href: "/Analytics", label: "Analytics", icon: ChartSpline },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 

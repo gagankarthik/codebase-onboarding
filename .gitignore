@@ -23,6 +23,9 @@
 # cli
 /cli/dist
 /cli/node_modules
+/cli/.next
+/cli/out
+/cli/build
 
 
 # misc
