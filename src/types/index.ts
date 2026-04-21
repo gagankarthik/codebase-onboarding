@@ -72,6 +72,50 @@ export interface Guide {
   version: number
 }
 
+// ── Analytics ─────────────────────────────────────────────────────────────────
+
+export interface PageViewRecord {
+  pvId: string
+  repoId: string
+  sessionId: string
+  pathname: string
+  referrer?: string
+  device: "desktop" | "mobile" | "tablet"
+  browser: string
+  os: string
+  duration?: number
+  timestamp: string
+}
+
+export interface AnalyticsSession {
+  sessionId: string
+  repoId: string
+  pageCount: number
+  startedAt: string
+  lastSeenAt: string
+}
+
+export interface AnalyticsTimeSeries {
+  label: string
+  visitors: number
+  views: number
+}
+
+export interface AnalyticsSummary {
+  uniqueVisitors: number
+  pageViews: number
+  bounceRate: number
+  avgDuration: number
+  activeVisitors: number
+  topPages: { pathname: string; views: number; pct: number }[]
+  topReferrers: { referrer: string; visits: number; pct: number }[]
+  deviceBreakdown: { label: string; count: number; pct: number }[]
+  browserBreakdown: { label: string; count: number; pct: number }[]
+  timeSeries: AnalyticsTimeSeries[]
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+
 export type WebEventType = "error" | "warning" | "api_error" | "page_view" | "performance" | "info"
 
 export interface EventAnalysis {

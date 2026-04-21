@@ -30,7 +30,7 @@ const NAV_ITEMS = [
   { href: "/onboarding", label: "Onboardings", icon: Users },
   { href: "/security", label: "Security", icon: Shield },
   { href: "/events", label: "Events", icon: Bell },
-  { href: "/Analytics", label: "Analytics", icon: ChartSpline },
+  { href: "/analytics", label: "Analytics", icon: ChartSpline },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 

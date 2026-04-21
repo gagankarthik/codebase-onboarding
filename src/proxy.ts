@@ -15,10 +15,11 @@ const PROTECTED_PATHS = [
   "/api/github",
   "/api/security",
   "/api/events",
+  "/api/analytics",
 ]
 
 // Sub-paths of protected routes that are public (use their own auth e.g. API key)
-const PUBLIC_SUBPATHS = ["/api/events/ingest"]
+const PUBLIC_SUBPATHS = ["/api/events/ingest", "/api/analytics/collect"]
 const AUTH_PATHS = ["/sign-in"]
 
 function getSecret(): Uint8Array {
