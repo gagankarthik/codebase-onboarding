@@ -8,7 +8,8 @@
       "Bash(npm run *)",
       "Bash(npx tsc *)",
       "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(item['text']\\) for item in data if item['type']=='text']\")",
-      "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")"
+      "Bash(grep -E \"\\\\.\\(ts|js|json\\)$\")",
+      "Bash(npx next *)"
     ]
   }
 }

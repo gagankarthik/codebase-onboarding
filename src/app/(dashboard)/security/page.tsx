@@ -26,8 +26,6 @@ import { staggerContainer, fadeInUp } from "@/lib/animations"
 import { formatRelativeTime } from "@/lib/utils"
 import type { Repo, SecurityScan, SecurityFinding } from "@/types"
 
-export const metadata = { title: "Security — Codebase" }
-
 type SeverityLevel = "critical" | "high" | "medium" | "low"
 
 const SEVERITY_META: Record<
