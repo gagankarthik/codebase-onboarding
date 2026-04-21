@@ -1,10 +1,10 @@
 {
-  "name": "onboarding-ai",
+  "name": "onboardai",
   "version": "1.0.0",
   "description": "CLI for OnboardAI — accelerate developer onboarding",
   "main": "dist/index.js",
   "bin": {
-    "onboarding-ai": "dist/index.js"
+    "onboardai": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",

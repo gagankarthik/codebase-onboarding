@@ -20,7 +20,7 @@ export default function LandingPage() {
   }, [])
 
   const copyCommand = () => {
-    navigator.clipboard?.writeText('npx onboardai init')
+    navigator.clipboard?.writeText('npm i onboarding-ai')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
