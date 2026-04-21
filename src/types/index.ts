@@ -3,6 +3,7 @@ export interface User {
   email: string
   name: string
   plan: "starter" | "growth" | "scale"
+  apiKey?: string
   createdAt: string
 }
 

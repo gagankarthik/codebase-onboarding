@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Copy, Check, GitBranch, RefreshCw } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Copy, Check, GitBranch, RefreshCw, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,8 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PageHeader } from "@/components/ui/page-header"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { generateId } from "@/lib/utils"
-import type { Metadata } from "next"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const PLANS = [
   {
@@ -49,16 +48,56 @@ const PLANS = [
   },
 ]
 
+function initials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("")
+}
+
 function AccountTab() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [plan, setPlan] = useState<string>("starter")
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
+  useEffect(() => {
+    fetch("/api/settings/account")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.user) {
+          setName(data.user.name ?? "")
+          setEmail(data.user.email ?? "")
+          setPlan(data.user.plan ?? "starter")
+        }
+      })
+      .catch(() => toast.error("Failed to load account details."))
+      .finally(() => setLoading(false))
+  }, [])
+
   async function handleSave() {
+    const trimmed = name.trim()
+    if (!trimmed) {
+      toast.error("Name cannot be empty.")
+      return
+    }
     setSaving(true)
-    await new Promise((r) => setTimeout(r, 800))
-    toast.success("Profile updated successfully.")
-    setSaving(false)
+    try {
+      const res = await fetch("/api/settings/account", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed }),
+      })
+      if (!res.ok) throw new Error()
+      toast.success("Profile updated successfully.")
+    } catch {
+      toast.error("Failed to save changes. Please try again.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -67,25 +106,49 @@ function AccountTab() {
         <h3 className="font-semibold text-foreground">Profile</h3>
         <div className="mt-4 flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-xl font-bold text-primary-foreground">
-            U
+            {loading ? "…" : (initials(name) || "?")}
           </div>
-          <Button variant="outline" size="sm">
-            Change avatar
-          </Button>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="name">Full name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+            {loading ? (
+              <Skeleton className="h-9 w-full rounded-md" />
+            ) : (
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+              />
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Email address</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
+            {loading ? (
+              <Skeleton className="h-9 w-full rounded-md" />
+            ) : (
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                readOnly
+                disabled
+                className="cursor-not-allowed opacity-60"
+              />
+            )}
+            <p className="text-xs text-foreground-muted">Email is managed by your auth provider.</p>
           </div>
         </div>
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-xs text-foreground-muted">Plan:</span>
+          <span className="rounded-full bg-primary-subtle px-2 py-0.5 text-xs font-medium capitalize text-primary">
+            {plan}
+          </span>
+        </div>
         <div className="mt-4">
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Save changes"}
+          <Button onClick={handleSave} disabled={saving || loading}>
+            {saving ? "Saving…" : "Save changes"}
           </Button>
         </div>
       </div>
@@ -101,7 +164,9 @@ function AccountTab() {
             description="This will permanently delete your account, all repos, onboardings, and guides. This action cannot be undone."
             confirmLabel="Delete my account"
             destructive
-            onConfirm={() => { toast.error("Account deletion is not available in this demo.") }}
+            onConfirm={() => {
+              toast.error("Account deletion is not available in this environment.")
+            }}
             trigger={
               <Button variant="destructive" size="sm">
                 Delete account
@@ -115,7 +180,14 @@ function AccountTab() {
 }
 
 function BillingTab() {
-  const currentPlan = "growth"
+  const [currentPlan, setCurrentPlan] = useState<string>("growth")
+
+  useEffect(() => {
+    fetch("/api/settings/account")
+      .then((r) => r.json())
+      .then((data) => { if (data.user?.plan) setCurrentPlan(data.user.plan) })
+      .catch(() => {})
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -126,9 +198,7 @@ function BillingTab() {
             <div
               key={plan.name}
               className={`relative rounded-xl border p-5 ${
-                plan.highlight
-                  ? "border-primary bg-primary-subtle"
-                  : "border-border bg-card"
+                plan.highlight ? "border-primary bg-primary-subtle" : "border-border bg-card"
               }`}
             >
               {plan.highlight && plan.badge && (
@@ -178,13 +248,37 @@ function IntegrationsTab() {
   return (
     <div className="space-y-4">
       {[
-        { name: "GitHub", icon: GitBranch, connected: true, description: "Sync repositories and receive push webhooks" },
-        { name: "Slack", icon: null, connected: false, description: "Get notified when a new hire's guide is ready", comingSoon: true },
-        { name: "GitLab", icon: null, connected: false, description: "Connect GitLab repositories", comingSoon: true },
+        {
+          name: "GitHub",
+          icon: GitBranch,
+          connected: true,
+          description: "Sync repositories and receive push webhooks",
+        },
+        {
+          name: "Slack",
+          icon: null,
+          connected: false,
+          description: "Get notified when a new hire's guide is ready",
+          comingSoon: true,
+        },
+        {
+          name: "GitLab",
+          icon: null,
+          connected: false,
+          description: "Connect GitLab repositories",
+          comingSoon: true,
+        },
       ].map((int) => (
-        <div key={int.name} className="flex items-center gap-4 rounded-xl border border-border bg-card p-5">
+        <div
+          key={int.name}
+          className="flex items-center gap-4 rounded-xl border border-border bg-card p-5"
+        >
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background-muted">
-            {int.icon ? <int.icon className="h-5 w-5" /> : <span className="text-sm font-bold">{int.name[0]}</span>}
+            {int.icon ? (
+              <int.icon className="h-5 w-5" />
+            ) : (
+              <span className="text-sm font-bold">{int.name[0]}</span>
+            )}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
@@ -198,8 +292,12 @@ function IntegrationsTab() {
             <p className="text-xs text-foreground-muted">{int.description}</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${int.connected ? "bg-success" : "bg-border"}`} />
-            <span className="text-xs text-foreground-muted">{int.connected ? "Connected" : "Not connected"}</span>
+            <span
+              className={`h-2 w-2 rounded-full ${int.connected ? "bg-success" : "bg-border"}`}
+            />
+            <span className="text-xs text-foreground-muted">
+              {int.connected ? "Connected" : "Not connected"}
+            </span>
           </div>
           {!int.comingSoon && (
             <Button variant="outline" size="sm" disabled={int.connected}>
@@ -213,53 +311,115 @@ function IntegrationsTab() {
 }
 
 function APITab() {
-  const [apiKey] = useState(`coa_${generateId().replace(/-/g, "").slice(0, 32)}`)
+  const [apiKey, setApiKey] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [regenerating, setRegenerating] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/settings/api-key")
+      .then((r) => r.json())
+      .then((data) => { if (data.apiKey) setApiKey(data.apiKey) })
+      .catch(() => toast.error("Failed to load API key."))
+      .finally(() => setLoading(false))
+  }, [])
 
   function handleCopy() {
+    if (!apiKey) return
     navigator.clipboard.writeText(apiKey).catch(() => {})
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  async function handleRegenerate() {
+    setRegenerating(true)
+    try {
+      const res = await fetch("/api/settings/api-key/regenerate", { method: "POST" })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setApiKey(data.apiKey)
+      setRevealed(true)
+      toast.success("API key regenerated. Update your CLI config.")
+    } catch {
+      toast.error("Failed to regenerate API key.")
+    } finally {
+      setRegenerating(false)
+    }
+  }
+
+  const displayValue = loading ? "" : (apiKey ?? "")
+  const maskedValue = displayValue.slice(0, 7) + "•".repeat(Math.max(0, displayValue.length - 7))
 
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-card p-6">
         <h3 className="font-semibold text-foreground">API Key</h3>
         <p className="mt-1 text-sm text-foreground-muted">
-          Use this key to authenticate requests to the Codebase Onboarding API.
+          Use this key with the{" "}
+          <code className="rounded bg-background-muted px-1 font-mono text-xs">onboardai</code>{" "}
+          CLI and REST API. Keep it secret — treat it like a password.
         </p>
-        <div className="mt-4 flex items-center gap-2">
-          <Input
-            type={revealed ? "text" : "password"}
-            value={apiKey}
-            readOnly
-            className="font-mono text-xs"
-          />
-          <Button variant="outline" size="sm" onClick={() => setRevealed((v) => !v)}>
-            {revealed ? "Hide" : "Reveal"}
-          </Button>
-          <Button variant="outline" size="icon-sm" onClick={handleCopy} aria-label="Copy API key">
-            {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {loading ? (
+            <Skeleton className="h-9 flex-1 rounded-md" />
+          ) : (
+            <Input
+              type="text"
+              value={revealed ? displayValue : maskedValue}
+              readOnly
+              className="flex-1 font-mono text-xs"
+            />
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setRevealed((v) => !v)}
+            disabled={loading}
+          >
+            {revealed ? (
+              <><EyeOff className="mr-1.5 h-3.5 w-3.5" />Hide</>
+            ) : (
+              <><Eye className="mr-1.5 h-3.5 w-3.5" />Reveal</>
+            )}
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => toast.info("Key regeneration not available in demo.")}
+            onClick={handleCopy}
+            disabled={loading || !apiKey}
+            aria-label="Copy API key"
           >
-            <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-            Regenerate
+            {copied ? (
+              <><Check className="mr-1.5 h-3.5 w-3.5 text-success" />Copied</>
+            ) : (
+              <><Copy className="mr-1.5 h-3.5 w-3.5" />Copy</>
+            )}
           </Button>
+          <ConfirmDialog
+            title="Regenerate API key"
+            description="Your current key will stop working immediately. Any CLI config or scripts using it will need to be updated."
+            confirmLabel="Regenerate key"
+            destructive
+            onConfirm={handleRegenerate}
+            trigger={
+              <Button variant="outline" size="sm" disabled={regenerating || loading}>
+                <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${regenerating ? "animate-spin" : ""}`} />
+                Regenerate
+              </Button>
+            }
+          />
         </div>
-        <p className="mt-2 text-xs text-foreground-muted">
-          Keep this key secret — treat it like a password.
-        </p>
+        <div className="mt-4 rounded-lg bg-background-muted p-3 font-mono text-xs text-foreground-muted">
+          <span className="text-foreground-subtle"># CLI quick start</span>
+          <br />
+          onboardai sync --api-key {loading ? "<your-key>" : (apiKey ?? "<your-key>")}
+        </div>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-6">
         <h3 className="font-semibold text-foreground">Usage</h3>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
+        <div className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
           {[
             { label: "API calls this month", value: "0" },
             { label: "Guides generated", value: "0" },
@@ -282,7 +442,7 @@ export default function SettingsPage() {
       <PageHeader title="Settings" subtitle="Manage your account, billing, and integrations" />
 
       <Tabs defaultValue="account">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-none lg:flex">
+        <TabsList className="grid w-full grid-cols-4 lg:flex lg:w-auto lg:grid-cols-none">
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="billing">Plan & Billing</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>

@@ -1,6 +1,6 @@
 {
   "name": "onboardai",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI for OnboardAI — accelerate developer onboarding",
   "main": "dist/index.js",
   "bin": {

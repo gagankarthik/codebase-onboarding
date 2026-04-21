@@ -16,6 +16,7 @@ const PROTECTED_PATHS = [
   "/api/security",
   "/api/events",
   "/api/analytics",
+  "/api/settings",
 ]
 
 // Sub-paths of protected routes that are public (use their own auth e.g. API key)
