@@ -24,6 +24,7 @@ Built with **Next.js · AWS Cognito · DynamoDB · GPT-4o mini · AWS Amplify**
 - [DynamoDB Schema](#dynamodb-schema)
 - [API Routes](#api-routes)
 - [Authentication Flow](#authentication-flow)
+- [CLI](#cli)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -688,6 +689,81 @@ export const config = {
   matcher: ['/dashboard/:path*', '/api/repos/:path*', '/api/onboarding/:path*', '/api/guide/:path*', '/api/chat'],
 };
 ```
+
+---
+
+## CLI
+
+The `onboardai` CLI runs in any project directory and syncs progress to your dashboard.
+
+### Install
+
+```bash
+npm install -g onboardai
+```
+
+Or run one-off without installing:
+
+```bash
+npx onboardai <command>
+```
+
+### Commands
+
+| Command | Description |
+|---|---|
+| `onboardai init` | Environment setup wizard — installs deps, copies `.env.local`, adds pre-commit hook |
+| `onboardai security` | Scan for hardcoded secrets, unsafe patterns, and npm vulnerabilities |
+| `onboardai status` | Health check — Node version, dependencies, env vars, open ports, git state |
+| `onboardai fix` | Auto-fix common issues (vulnerabilities, missing env keys, blocked ports) |
+| `onboardai monitor` | Stream live web events to terminal, optionally with AI analysis |
+| `onboardai sync` | Push project progress to your OnboardAI dashboard |
+| `onboardai report` | Generate a progress report, optionally email it |
+| `onboardai share` | Copy a shareable context summary to clipboard |
+
+### Quick start
+
+```bash
+# 1. Install the CLI
+npm install -g onboardai
+
+# 2. Set up your project
+onboardai init
+
+# 3. Run a security scan
+onboardai security
+
+# 4. Sync progress to your dashboard (get your API key from Settings → API)
+onboardai sync --api-key coa_YOUR_KEY_HERE
+```
+
+After the first sync with `--api-key`, the key is saved to `~/.onboardai/config.json` and future syncs require no flags:
+
+```bash
+onboardai sync
+```
+
+### Pointing at a local instance
+
+By default the CLI syncs to your deployed dashboard. To point at a local dev server:
+
+```bash
+# Save once — all future syncs use localhost
+onboardai sync --api-key coa_YOUR_KEY --api-url http://localhost:3000
+```
+
+Or edit `~/.onboardai/config.json` directly:
+
+```json
+{
+  "apiKey": "coa_YOUR_KEY",
+  "apiUrl": "http://localhost:3000"
+}
+```
+
+### Full CLI docs
+
+See [/docs](/docs) for the complete command reference including flags, JSON output mode, CI integration, and how to publish the CLI to npm.
 
 ---
 

@@ -59,6 +59,7 @@ export interface SyncPayload {
 }
 
 export async function syncProgress(payload: SyncPayload, apiKey: string): Promise<void> {
-  const client = createApiClient(apiKey)
+  const config = await readConfig()
+  const client = createApiClient(apiKey, config.apiUrl)
   await client.post("/api/cli/sync", payload)
 }

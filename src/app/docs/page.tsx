@@ -286,6 +286,7 @@ const NAV_SECTIONS = [
 
 export default function DocsPage() {
   const [active, setActive] = useState("overview")
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
@@ -309,41 +310,68 @@ export default function DocsPage() {
 
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+    setMobileNavOpen(false)
   }
 
-  let lastGroup: string | null = "—"
+  function NavItems() {
+    let lastGroupInner: string | null = "—"
+    return (
+      <>
+        {NAV_SECTIONS.map((s) => {
+          const showGroup = s.group !== null && s.group !== lastGroupInner
+          if (showGroup) lastGroupInner = s.group
+          return (
+            <div key={s.id}>
+              {showGroup && (
+                <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-foreground-subtle first:mt-0">
+                  {s.group}
+                </p>
+              )}
+              <button
+                onClick={() => scrollTo(s.id)}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs transition-colors",
+                  active === s.id
+                    ? "bg-primary-subtle font-medium text-primary"
+                    : "text-foreground-muted hover:bg-background-muted hover:text-foreground"
+                )}
+              >
+                {active === s.id && <ChevronRight className="h-3 w-3 shrink-0" />}
+                <span className={cn(s.id !== active && "ml-[18px]", "font-mono")}>{s.label}</span>
+              </button>
+            </div>
+          )
+        })}
+      </>
+    )
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-24 pt-10 sm:px-6">
+      {/* ── Mobile nav toggle ── */}
+      <div className="mb-6 lg:hidden">
+        <button
+          onClick={() => setMobileNavOpen((o) => !o)}
+          className="flex items-center gap-2 rounded-lg border border-border bg-background-muted px-3 py-2 text-xs font-medium text-foreground-muted transition-colors hover:text-foreground"
+        >
+          <BookOpen className="h-3.5 w-3.5" />
+          Contents
+          <ChevronRight
+            className={cn("ml-auto h-3.5 w-3.5 transition-transform", mobileNavOpen && "rotate-90")}
+          />
+        </button>
+        {mobileNavOpen && (
+          <div className="mt-2 rounded-xl border border-border bg-background p-3 shadow-md">
+            <NavItems />
+          </div>
+        )}
+      </div>
+
       <div className="flex gap-10">
-        {/* ── Left nav ── */}
-        <aside className="hidden w-52 shrink-0 xl:block">
+        {/* ── Left nav (desktop) ── */}
+        <aside className="hidden w-52 shrink-0 lg:block">
           <div className="sticky top-20 space-y-0.5">
-            {NAV_SECTIONS.map((s) => {
-              const showGroup = s.group !== null && s.group !== lastGroup
-              if (showGroup) lastGroup = s.group
-              return (
-                <div key={s.id}>
-                  {showGroup && (
-                    <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-foreground-subtle first:mt-0">
-                      {s.group}
-                    </p>
-                  )}
-                  <button
-                    onClick={() => scrollTo(s.id)}
-                    className={cn(
-                      "flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs transition-colors",
-                      active === s.id
-                        ? "bg-primary-subtle font-medium text-primary"
-                        : "text-foreground-muted hover:bg-background-muted hover:text-foreground"
-                    )}
-                  >
-                    {active === s.id && <ChevronRight className="h-3 w-3 shrink-0" />}
-                    <span className={cn(s.id !== active && "ml-[18px]", "font-mono")}>{s.label}</span>
-                  </button>
-                </div>
-              )
-            })}
+            <NavItems />
           </div>
         </aside>
 

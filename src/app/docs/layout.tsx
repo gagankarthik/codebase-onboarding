@@ -36,13 +36,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <nav className="flex items-center gap-1">
             <Link
               href="/dashboard"
-              className="rounded-lg px-3 py-1.5 text-xs text-foreground-muted transition-colors hover:bg-background-muted hover:text-foreground"
+              className="hidden rounded-lg px-3 py-1.5 text-xs text-foreground-muted transition-colors hover:bg-background-muted hover:text-foreground sm:block"
             >
               Dashboard
             </Link>
             <Link
               href="/security"
-              className="rounded-lg px-3 py-1.5 text-xs text-foreground-muted transition-colors hover:bg-background-muted hover:text-foreground"
+              className="hidden rounded-lg px-3 py-1.5 text-xs text-foreground-muted transition-colors hover:bg-background-muted hover:text-foreground sm:block"
             >
               Security
             </Link>
@@ -50,7 +50,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs text-foreground-muted transition-colors hover:bg-background-muted hover:text-foreground"
+              className="hidden items-center gap-1 rounded-lg px-3 py-1.5 text-xs text-foreground-muted transition-colors hover:bg-background-muted hover:text-foreground sm:flex"
             >
               GitHub
               <ExternalLink className="h-3 w-3" />

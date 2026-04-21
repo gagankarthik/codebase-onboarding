@@ -14,6 +14,7 @@ import * as fs from "fs-extra"
 
 interface SyncOptions {
   apiKey?: string
+  apiUrl?: string
 }
 
 export async function syncCommand(options: SyncOptions): Promise<void> {
@@ -24,27 +25,25 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
   console.log(chalk.gray("  ─────────────────────────────────────────"))
   console.log()
 
-  // Resolve API key
-  let apiKey = options.apiKey
-  if (!apiKey) {
-    const config = await readConfig()
-    apiKey = config.apiKey
-  }
+  // Resolve API key and URL — flag wins, then config, then default
+  const config = await readConfig()
+  let apiKey = options.apiKey ?? config.apiKey
+  const apiUrl = options.apiUrl ?? config.apiUrl
 
   if (!apiKey) {
     log.error("No API key provided.")
     log.muted("Pass it with --api-key <key> or save it permanently:")
     log.muted("  onboardai sync --api-key <your-key>")
     log.muted("")
-    log.muted("Get your API key from: https://app.onboardai.dev/settings → API tab")
+    log.muted("Get your API key from Settings → API tab in your dashboard")
     console.log()
     return
   }
 
-  // Save key for future use
-  const config = await readConfig()
-  if (config.apiKey !== apiKey) {
-    await writeConfig({ ...config, apiKey })
+  // Persist any new values
+  const needsWrite = config.apiKey !== apiKey || (apiUrl && config.apiUrl !== apiUrl)
+  if (needsWrite) {
+    await writeConfig({ ...config, apiKey, ...(apiUrl ? { apiUrl } : {}) })
     log.success("API key saved for future syncs")
   }
 
@@ -98,7 +97,8 @@ export async function syncCommand(options: SyncOptions): Promise<void> {
     await syncProgress(payload, apiKey)
     s2.succeed("Progress synced successfully!")
     console.log()
-    log.info("View your onboarding dashboard at: https://app.onboardai.dev/dashboard")
+    const baseUrl = apiUrl ?? "https://app.onboardai.dev"
+    log.info(`View your onboarding dashboard at: ${baseUrl}/dashboard`)
   } catch (err) {
     s2.fail("Sync failed")
     const message = err instanceof Error ? err.message : "Unknown error"

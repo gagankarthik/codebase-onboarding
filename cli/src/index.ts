@@ -61,6 +61,7 @@ program
   .command("sync")
   .description("Sync local progress with the OnboardAI dashboard")
   .option("--api-key <key>", "Your OnboardAI API key")
+  .option("--api-url <url>", "Dashboard URL (default: https://app.onboardai.dev)")
   .action(syncCommand)
 
 program
