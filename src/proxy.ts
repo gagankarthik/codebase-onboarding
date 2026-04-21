@@ -13,6 +13,7 @@ const PROTECTED_PATHS = [
   "/api/guide",
   "/api/chat",
   "/api/github",
+  "/api/security",
 ]
 const AUTH_PATHS = ["/sign-in"]
 
@@ -23,7 +24,7 @@ function getSecret(): Uint8Array {
 async function getSession(token: string) {
   try {
     const { payload } = await jwtVerify(token, getSecret())
-    return payload as { userId?: string }
+    return payload as { userId?: string; githubToken?: string }
   } catch {
     return null
   }
@@ -54,6 +55,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
     const response = NextResponse.next()
     response.headers.set("x-user-id", session.userId)
+    if (session.githubToken) {
+      response.headers.set("x-github-token", session.githubToken)
+    }
     return response
   }
 

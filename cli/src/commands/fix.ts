@@ -1,4 +1,4 @@
-import { execa } from "execa"
+import execa from "execa"
 import inquirer from "inquirer"
 import * as path from "path"
 import * as fs from "fs-extra"

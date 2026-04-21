@@ -55,8 +55,8 @@ export function progressBar(pct: number, width = 30): string {
   return `[${bar}] ${pct.toFixed(0)}%`
 }
 
-export function scoreColor(score: number): chalk.Chalk {
-  if (score >= 90) return chalk.green
-  if (score >= 70) return chalk.yellow
-  return chalk.red
+export function scoreColor(score: number): (text: string) => string {
+  if (score >= 90) return (t) => chalk.green(t)
+  if (score >= 70) return (t) => chalk.yellow(t)
+  return (t) => chalk.red(t)
 }

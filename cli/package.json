@@ -4,7 +4,7 @@
   "description": "CLI for OnboardAI — accelerate developer onboarding",
   "main": "dist/index.js",
   "bin": {
-    "onboardai": "./dist/index.js"
+    "onboardai": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",

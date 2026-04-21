@@ -9,7 +9,6 @@ import {
   Users,
   Settings,
   Shield,
-  BookOpen,
   ChevronLeft,
   ChevronRight,
   Moon,
@@ -29,7 +28,6 @@ const NAV_ITEMS = [
   { href: "/repos", label: "Repositories", icon: GitBranch },
   { href: "/onboarding", label: "Onboardings", icon: Users },
   { href: "/security", label: "Security", icon: Shield },
-  { href: "/docs", label: "Docs", icon: BookOpen },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 

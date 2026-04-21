@@ -1,4 +1,4 @@
-import { execa } from "execa"
+import execa from "execa"
 import semver from "semver"
 import * as fs from "fs-extra"
 import * as path from "path"
@@ -122,7 +122,7 @@ export async function killPort(port: number): Promise<boolean> {
   try {
     if (process.platform === "win32") {
       const { stdout } = await execa("netstat", ["-ano"])
-      const lines = stdout.split("\n").filter((l) => l.includes(`:${port} `))
+      const lines = stdout.split("\n").filter((l: string) => l.includes(`:${port} `))
       for (const line of lines) {
         const pid = line.trim().split(/\s+/).pop()
         if (pid && /^\d+$/.test(pid)) {
@@ -130,9 +130,9 @@ export async function killPort(port: number): Promise<boolean> {
         }
       }
     } else {
-      await execa("lsof", ["-ti", `:${port}`]).then(({ stdout }) => {
+      await execa("lsof", ["-ti", `:${port}`]).then(({ stdout }: { stdout: string }) => {
         const pids = stdout.trim().split("\n").filter(Boolean)
-        return Promise.all(pids.map((pid) => execa("kill", ["-9", pid])))
+        return Promise.all(pids.map((pid: string) => execa("kill", ["-9", pid])))
       })
     }
     return true
